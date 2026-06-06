@@ -435,6 +435,23 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: trimmed, city: city || undefined }),
       });
+      if (res.status === 429) {
+        const data = await res.json();
+        toast(
+          (t) => (
+            <span>
+              Daily limit reached ({data.used}/{data.max} searches).{" "}
+              <a href="/premium" onClick={() => toast.dismiss(t.id)} className="text-orange-300 underline font-semibold">
+                Upgrade to Premium →
+              </a>
+            </span>
+          ),
+          { duration: 6000 }
+        );
+        setLoading(false);
+        setSearched(false);
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         if (data.foods?.length > 0) {
@@ -606,6 +623,9 @@ export default function Home() {
             </Link>
             <Link href="/metrics" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
               <span>📈</span><span className="hidden sm:inline">Metrics</span>
+            </Link>
+            <Link href="/premium" className="flex items-center gap-1 text-xs text-orange-500/70 hover:text-orange-400 transition-colors font-semibold">
+              <span>⭐</span><span className="hidden sm:inline">Premium</span>
             </Link>
           </div>
           <AuthButton />

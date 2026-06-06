@@ -1,7 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { getProfile } from "@/lib/db";
+import { getProfile, getDailySearchCount, getUserIsPremium } from "@/lib/db";
+
+const FREE_DAILY_LIMIT = 10;
 
 const UNS = (q: string) =>
   `https://source.unsplash.com/featured/800x600/?${encodeURIComponent(q)}`;
@@ -46,11 +48,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "API key not configured" }, { status: 500 });
   }
 
-  // Fetch profile for signed-in users
+  // Fetch session + enforce search limits
   const session = await auth();
-  const profile = session?.user?.email
-    ? await getProfile(session.user.email).catch(() => null)
-    : null;
+  const userId = session?.user?.email ?? null;
+
+  if (userId) {
+    const [isPremium, dailyCount] = await Promise.all([
+      getUserIsPremium(userId).catch(() => false),
+      getDailySearchCount(userId).catch(() => 0),
+    ]);
+    if (!isPremium && dailyCount >= FREE_DAILY_LIMIT) {
+      return NextResponse.json(
+        { error: "Daily limit reached", limit: true, used: dailyCount, max: FREE_DAILY_LIMIT },
+        { status: 429 }
+      );
+    }
+  }
+
+  const profile = userId ? await getProfile(userId).catch(() => null) : null;
 
   const client = new Anthropic();
   const message = await client.messages.create({

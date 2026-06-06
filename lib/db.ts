@@ -520,19 +520,37 @@ export async function getLeaderboard(limit = 20): Promise<{ query: string; count
 export async function getMetrics() {
   await initDb();
   await initProfilesExtended();
-  const [s30, mau, fav, total, premium] = await Promise.all([
+  const [s30, mau, fav, total, premium, thisWeek, lastWeek, weeklyTrend] = await Promise.all([
     sql`SELECT COUNT(*)::int AS c FROM searches WHERE searched_at > NOW() - INTERVAL '30 days'`,
     sql`SELECT COUNT(DISTINCT user_id)::int AS c FROM searches WHERE user_id IS NOT NULL AND searched_at > NOW() - INTERVAL '30 days'`,
     sql`SELECT COUNT(*)::int AS c FROM favorites`,
     sql`SELECT COUNT(*)::int AS c FROM searches`,
     sql`SELECT COUNT(*)::int AS c FROM profiles WHERE is_premium = TRUE`,
+    sql`SELECT COUNT(DISTINCT user_id)::int AS c FROM searches WHERE user_id IS NOT NULL AND searched_at >= date_trunc('week', NOW())`,
+    sql`SELECT COUNT(DISTINCT user_id)::int AS c FROM searches WHERE user_id IS NOT NULL AND searched_at >= date_trunc('week', NOW() - INTERVAL '7 days') AND searched_at < date_trunc('week', NOW())`,
+    sql`
+      SELECT date_trunc('week', searched_at)::date AS week,
+             COUNT(DISTINCT user_id)::int AS users,
+             COUNT(*)::int AS searches
+      FROM searches
+      WHERE user_id IS NOT NULL AND searched_at > NOW() - INTERVAL '8 weeks'
+      GROUP BY date_trunc('week', searched_at)
+      ORDER BY week
+    `,
   ]);
+  const tw = (thisWeek.rows[0] as { c: number }).c;
+  const lw = (lastWeek.rows[0] as { c: number }).c;
+  const wow = lw === 0 ? null : Math.round(((tw - lw) / lw) * 100);
   return {
     searches_30d: (s30.rows[0] as { c: number }).c,
     mau: (mau.rows[0] as { c: number }).c,
     total_favorites: (fav.rows[0] as { c: number }).c,
     total_searches: (total.rows[0] as { c: number }).c,
     premium_users: (premium.rows[0] as { c: number }).c,
+    wow_growth: wow,
+    this_week_users: tw,
+    last_week_users: lw,
+    weekly_trend: weeklyTrend.rows as { week: string; users: number; searches: number }[],
   };
 }
 
