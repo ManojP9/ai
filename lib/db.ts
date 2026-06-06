@@ -202,6 +202,11 @@ export async function initVersion1() {
   // safe migration for existing tables created before status/error_note columns
   await sql`ALTER TABLE version1 ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending'`;
   await sql`ALTER TABLE version1 ADD COLUMN IF NOT EXISTS error_note TEXT`;
+  // auto-mark shipped phases as done (only touches rows still at default 'pending')
+  await sql`
+    UPDATE version1 SET status = 'done'
+    WHERE phase IN (1, 2) AND parent_id IS NOT NULL AND status = 'pending'
+  `;
 }
 
 export async function updateVersion1Task(id: number, status: TaskStatus, error_note?: string) {
