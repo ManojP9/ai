@@ -1,66 +1,84 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface Food {
   name: string;
   desc: string;
   emoji: string;
   tag: string;
+  img: string;
 }
+
+const UNS = (q: string) =>
+  `https://source.unsplash.com/featured/800x600/?${q}`;
 
 const FOOD_DB: Record<string, Food[]> = {
   indian: [
-    { name: "Biryani", desc: "Aromatic rice dish with spices and tender meat or vegetables", emoji: "🍛", tag: "Indian" },
-    { name: "Butter Chicken", desc: "Creamy tomato-based rich chicken curry", emoji: "🍗", tag: "Indian" },
-    { name: "Masala Dosa", desc: "Crispy South Indian crepe served with chutney & sambar", emoji: "🫓", tag: "South Indian" },
+    { name: "Biryani", desc: "Aromatic basmati rice layered with saffron, spices and tender meat", emoji: "🍛", tag: "Indian", img: UNS("biryani,indian,rice") },
+    { name: "Butter Chicken", desc: "Creamy tomato-based curry with succulent chicken pieces", emoji: "🍗", tag: "Indian", img: UNS("butter,chicken,curry,indian") },
+    { name: "Masala Dosa", desc: "Crispy South Indian rice crepe with spiced potato filling", emoji: "🫓", tag: "South Indian", img: UNS("dosa,indian,breakfast") },
   ],
   italian: [
-    { name: "Margherita Pizza", desc: "Classic Neapolitan pizza with fresh mozzarella and basil", emoji: "🍕", tag: "Italian" },
-    { name: "Spaghetti Carbonara", desc: "Silky pasta with eggs, pancetta, and Pecorino Romano", emoji: "🍝", tag: "Italian" },
-    { name: "Risotto", desc: "Creamy Arborio rice slowly cooked with broth and parmesan", emoji: "🍚", tag: "Italian" },
+    { name: "Margherita Pizza", desc: "Classic Neapolitan pizza with San Marzano tomatoes and fresh mozzarella", emoji: "🍕", tag: "Italian", img: UNS("pizza,margherita,italian") },
+    { name: "Spaghetti Carbonara", desc: "Silky Roman pasta with eggs, guanciale and Pecorino Romano", emoji: "🍝", tag: "Italian", img: UNS("pasta,carbonara,spaghetti") },
+    { name: "Risotto", desc: "Creamy Arborio rice slow-cooked with white wine and parmesan", emoji: "🍚", tag: "Italian", img: UNS("risotto,italian,rice") },
   ],
   mexican: [
-    { name: "Tacos al Pastor", desc: "Marinated pork on corn tortillas with pineapple & cilantro", emoji: "🌮", tag: "Mexican" },
-    { name: "Guacamole & Chips", desc: "Fresh avocado dip with lime, cilantro and jalapeño", emoji: "🥑", tag: "Mexican" },
-    { name: "Enchiladas", desc: "Rolled tortillas filled with chicken and smothered in chili sauce", emoji: "🫔", tag: "Mexican" },
+    { name: "Tacos al Pastor", desc: "Spit-grilled pork on corn tortillas with pineapple and cilantro", emoji: "🌮", tag: "Mexican", img: UNS("tacos,mexican,food") },
+    { name: "Guacamole & Chips", desc: "Fresh Hass avocados with lime, jalapeño and crispy tortilla chips", emoji: "🥑", tag: "Mexican", img: UNS("guacamole,avocado,chips") },
+    { name: "Enchiladas", desc: "Corn tortillas filled with chicken, smothered in red chili sauce", emoji: "🫔", tag: "Mexican", img: UNS("enchiladas,mexican,food") },
   ],
   japanese: [
-    { name: "Sushi Platter", desc: "Fresh nigiri and maki rolls with soy and wasabi", emoji: "🍣", tag: "Japanese" },
-    { name: "Ramen", desc: "Rich broth noodle soup with chashu pork and soft boiled egg", emoji: "🍜", tag: "Japanese" },
-    { name: "Tempura", desc: "Light battered and fried shrimp and vegetables", emoji: "🍤", tag: "Japanese" },
+    { name: "Sushi Platter", desc: "Chef's selection of nigiri and maki with pickled ginger and wasabi", emoji: "🍣", tag: "Japanese", img: UNS("sushi,japanese,food") },
+    { name: "Ramen", desc: "Rich tonkotsu broth with chashu pork, soft egg and nori", emoji: "🍜", tag: "Japanese", img: UNS("ramen,noodles,japanese") },
+    { name: "Tempura", desc: "Light panko-battered tiger shrimp and seasonal vegetables", emoji: "🍤", tag: "Japanese", img: UNS("tempura,japanese,shrimp") },
   ],
   chinese: [
-    { name: "Dim Sum", desc: "Steamed dumplings and buns served with dipping sauces", emoji: "🥟", tag: "Chinese" },
-    { name: "Kung Pao Chicken", desc: "Stir-fried chicken with peanuts, chili and Sichuan pepper", emoji: "🍗", tag: "Chinese" },
-    { name: "Peking Duck", desc: "Crispy roasted duck served with pancakes and hoisin sauce", emoji: "🦆", tag: "Chinese" },
+    { name: "Dim Sum", desc: "Delicate steamed har gow, siu mai and char siu bao with sauces", emoji: "🥟", tag: "Chinese", img: UNS("dim,sum,dumplings,chinese") },
+    { name: "Kung Pao Chicken", desc: "Wok-tossed chicken with peanuts, dried chili and Sichuan pepper", emoji: "🍗", tag: "Chinese", img: UNS("kung,pao,chicken,chinese,stir,fry") },
+    { name: "Peking Duck", desc: "Lacquered roast duck with pancakes, scallions and hoisin", emoji: "🦆", tag: "Chinese", img: UNS("peking,duck,chinese,roast") },
   ],
   american: [
-    { name: "BBQ Ribs", desc: "Slow-smoked pork ribs glazed with tangy barbecue sauce", emoji: "🥩", tag: "American" },
-    { name: "Cheeseburger", desc: "Juicy beef patty with melted cheese, lettuce and pickles", emoji: "🍔", tag: "American" },
-    { name: "Mac & Cheese", desc: "Creamy elbow pasta baked with a golden breadcrumb crust", emoji: "🧀", tag: "American" },
+    { name: "BBQ Ribs", desc: "12-hour smoked pork baby back ribs with house BBQ glaze", emoji: "🥩", tag: "American", img: UNS("bbq,ribs,smoked,meat") },
+    { name: "Cheeseburger", desc: "Double smash patty with American cheese, pickles and special sauce", emoji: "🍔", tag: "American", img: UNS("cheeseburger,burger,american") },
+    { name: "Mac & Cheese", desc: "Three-cheese elbow pasta baked with a golden panko crust", emoji: "🧀", tag: "American", img: UNS("mac,cheese,comfort,food") },
   ],
   thai: [
-    { name: "Pad Thai", desc: "Stir-fried rice noodles with shrimp, peanuts and tamarind", emoji: "🍜", tag: "Thai" },
-    { name: "Green Curry", desc: "Aromatic coconut milk curry with vegetables and fragrant herbs", emoji: "🍲", tag: "Thai" },
-    { name: "Mango Sticky Rice", desc: "Sweet glutinous rice served with fresh mango and coconut cream", emoji: "🥭", tag: "Thai" },
+    { name: "Pad Thai", desc: "Rice noodles stir-fried with shrimp, bean sprouts and tamarind", emoji: "🍜", tag: "Thai", img: UNS("pad,thai,noodles,thai,food") },
+    { name: "Green Curry", desc: "Coconut milk curry with Thai basil, eggplant and kaffir lime", emoji: "🍲", tag: "Thai", img: UNS("green,curry,thai,coconut") },
+    { name: "Mango Sticky Rice", desc: "Sweet glutinous rice with ripe Ataulfo mango and coconut cream", emoji: "🥭", tag: "Thai", img: UNS("mango,sticky,rice,thai,dessert") },
   ],
   mediterranean: [
-    { name: "Hummus & Pita", desc: "Creamy chickpea dip with olive oil and warm pita bread", emoji: "🫓", tag: "Mediterranean" },
-    { name: "Greek Salad", desc: "Crisp vegetables with feta, olives and oregano dressing", emoji: "🥗", tag: "Mediterranean" },
-    { name: "Shawarma", desc: "Spiced rotisserie meat wrapped in flatbread with garlic sauce", emoji: "🌯", tag: "Mediterranean" },
+    { name: "Hummus & Pita", desc: "Stone-ground chickpea hummus drizzled with olive oil and paprika", emoji: "🫓", tag: "Mediterranean", img: UNS("hummus,pita,bread,mediterranean") },
+    { name: "Greek Salad", desc: "Heirloom tomatoes, cucumber, kalamata olives and barrel-aged feta", emoji: "🥗", tag: "Mediterranean", img: UNS("greek,salad,feta,mediterranean") },
+    { name: "Shawarma", desc: "Slow-roasted spiced lamb in flatbread with garlic tahini sauce", emoji: "🌯", tag: "Mediterranean", img: UNS("shawarma,wrap,middle,eastern") },
   ],
   spicy: [
-    { name: "Nashville Hot Chicken", desc: "Fried chicken coated in fiery cayenne paste", emoji: "🔥", tag: "Spicy" },
-    { name: "Sichuan Mapo Tofu", desc: "Silken tofu in a numbing spicy chili bean sauce", emoji: "🌶️", tag: "Spicy" },
-    { name: "Vindaloo", desc: "Fiery Goan curry with vinegar-marinated pork and chili", emoji: "🥘", tag: "Spicy" },
+    { name: "Nashville Hot Chicken", desc: "Double-fried chicken thighs coated in fiery cayenne paste", emoji: "🔥", tag: "Spicy", img: UNS("fried,chicken,spicy,hot") },
+    { name: "Sichuan Mapo Tofu", desc: "Silken tofu in numbing spicy doubanjiang sauce with minced pork", emoji: "🌶️", tag: "Spicy", img: UNS("tofu,chinese,spicy,sichuan") },
+    { name: "Vindaloo", desc: "Fiery Goan pork curry with Kashmiri chili and palm vinegar", emoji: "🥘", tag: "Spicy", img: UNS("indian,curry,spicy,vindaloo") },
   ],
   vegetarian: [
-    { name: "Paneer Tikka", desc: "Grilled spiced cottage cheese with bell peppers and onions", emoji: "🧆", tag: "Vegetarian" },
-    { name: "Falafel Bowl", desc: "Crispy chickpea fritters over quinoa with tahini drizzle", emoji: "🥙", tag: "Vegetarian" },
-    { name: "Caprese Salad", desc: "Fresh tomato, mozzarella and basil with balsamic glaze", emoji: "🍅", tag: "Vegetarian" },
+    { name: "Paneer Tikka", desc: "Tandoor-charred cottage cheese with bell pepper and mint chutney", emoji: "🧆", tag: "Vegetarian", img: UNS("paneer,tikka,indian,vegetarian") },
+    { name: "Falafel Bowl", desc: "Crispy herbed chickpea fritters on quinoa with tahini and pickles", emoji: "🥙", tag: "Vegetarian", img: UNS("falafel,bowl,healthy,vegetarian") },
+    { name: "Caprese Salad", desc: "Buffalo mozzarella, heirloom tomato and basil with aged balsamic", emoji: "🍅", tag: "Vegetarian", img: UNS("caprese,salad,tomato,mozzarella") },
   ],
 };
+
+const CATEGORIES = [
+  { label: "Indian",         value: "indian",        emoji: "🍛", img: UNS("indian,curry,food") },
+  { label: "Italian",        value: "italian",       emoji: "🍕", img: UNS("pizza,pasta,italian") },
+  { label: "Mexican",        value: "mexican",       emoji: "🌮", img: UNS("tacos,mexican,food") },
+  { label: "Japanese",       value: "japanese",      emoji: "🍣", img: UNS("sushi,japanese,food") },
+  { label: "Chinese",        value: "chinese",       emoji: "🥟", img: UNS("chinese,food,dim,sum") },
+  { label: "American",       value: "american",      emoji: "🍔", img: UNS("burger,american,bbq") },
+  { label: "Thai",           value: "thai",          emoji: "🍜", img: UNS("thai,food,pad,thai") },
+  { label: "Mediterranean",  value: "mediterranean", emoji: "🥗", img: UNS("mediterranean,food,greek") },
+  { label: "Spicy",          value: "spicy",         emoji: "🔥", img: UNS("spicy,food,chili,hot") },
+  { label: "Vegetarian",     value: "vegetarian",    emoji: "🥗", img: UNS("vegetarian,healthy,salad") },
+];
 
 function getRecommendations(query: string): Food[] {
   const q = query.toLowerCase().trim();
@@ -86,30 +104,67 @@ function getRecommendations(query: string): Food[] {
   return [];
 }
 
-const SUGGESTIONS = [
-  { label: "🍛 Indian", value: "Indian" },
-  { label: "🍕 Italian", value: "Italian" },
-  { label: "🌮 Mexican", value: "Mexican" },
-  { label: "🍣 Japanese", value: "Japanese" },
-  { label: "🔥 Spicy", value: "Spicy" },
-  { label: "🥗 Vegetarian", value: "Vegetarian" },
-  { label: "🍜 Thai", value: "Thai" },
-  { label: "🥟 Chinese", value: "Chinese" },
+const RANK = [
+  { label: "1st", cls: "rank-gold" },
+  { label: "2nd", cls: "rank-silver" },
+  { label: "3rd", cls: "rank-bronze" },
 ];
 
-const RANK_LABELS = ["Gold", "Silver", "Bronze"];
-const RANK_COLORS = [
-  "from-yellow-400 to-orange-500",
-  "from-slate-300 to-slate-500",
-  "from-orange-700 to-amber-600",
-];
+function FoodCard({ food, rank, delay }: { food: Food; rank: number; delay: string }) {
+  return (
+    <div className={`food-card rounded-3xl fade-up`} style={{ animationDelay: delay }}>
+      {/* Image */}
+      <div className="relative w-full h-48 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={food.img}
+          alt={food.name}
+          className="w-full h-full object-cover"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = ""; e.currentTarget.style.display = "none"; }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Rank badge on image */}
+        <span className={`absolute top-3 left-3 ${RANK[rank].cls} text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}>
+          {RANK[rank].label}
+        </span>
+        {/* Tag on image */}
+        <span className="absolute top-3 right-3 bg-black/50 backdrop-blur text-white text-xs font-medium px-3 py-1 rounded-full border border-white/10">
+          {food.tag}
+        </span>
+      </div>
+      {/* Content */}
+      <div className="p-5">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-2xl">{food.emoji}</span>
+          <h2 className="text-white font-bold text-xl">{food.name}</h2>
+        </div>
+        <p className="text-slate-400 text-sm leading-relaxed">{food.desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function CatCard({ cat, onSelect }: { cat: typeof CATEGORIES[0]; onSelect: (v: string) => void }) {
+  return (
+    <button onClick={() => onSelect(cat.value)} className="cat-card rounded-2xl text-left w-full">
+      <div className="relative h-28 overflow-hidden rounded-t-2xl">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={cat.img} alt={cat.label} className="w-full h-full object-cover" />
+        <div className="cat-overlay absolute inset-0 flex flex-col items-center justify-center gap-1">
+          <span className="text-2xl">{cat.emoji}</span>
+          <span className="text-white font-bold text-sm drop-shadow">{cat.label}</span>
+        </div>
+      </div>
+    </button>
+  );
+}
 
 export default function Home() {
   const [query, setQuery] = useState("");
   const [submitted, setSubmitted] = useState("");
   const [results, setResults] = useState<Food[]>([]);
   const [searched, setSearched] = useState(false);
-  const [resultKey, setResultKey] = useState(0);
+  const [key, setKey] = useState(0);
 
   function handleSearch(q: string) {
     const trimmed = q.trim();
@@ -118,120 +173,111 @@ export default function Home() {
     setSubmitted(trimmed);
     setResults(getRecommendations(trimmed));
     setSearched(true);
-    setResultKey((k) => k + 1);
+    setKey((k) => k + 1);
+  }
+
+  function handleClear() {
+    setQuery("");
+    setSubmitted("");
+    setResults([]);
+    setSearched(false);
   }
 
   return (
-    <main className="relative min-h-screen bg-[#080810] overflow-hidden flex flex-col items-center px-4 pt-20 pb-24">
-      {/* Ambient orbs */}
-      <div className="orb w-[500px] h-[500px] bg-orange-600/20 -top-32 -left-32" />
-      <div className="orb w-[400px] h-[400px] bg-pink-600/15 top-1/2 -right-32" />
-      <div className="orb w-[300px] h-[300px] bg-violet-600/10 bottom-0 left-1/3" />
+    <main className="relative min-h-screen bg-[#07070f] overflow-x-hidden">
+      {/* Orbs */}
+      <div className="orb w-[600px] h-[600px] bg-orange-600/15 -top-40 -left-40" />
+      <div className="orb w-[500px] h-[500px] bg-pink-600/10 top-1/2 -right-40" />
+      <div className="orb w-[400px] h-[400px] bg-violet-700/10 bottom-20 left-1/4" />
 
-      <div className="relative w-full max-w-lg z-10">
+      <div className="relative z-10 max-w-2xl mx-auto px-4 pt-16 pb-24">
 
         {/* Header */}
-        <div className="text-center mb-12 animate-fade-up">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl glass mb-5 text-3xl shadow-lg">
-            🍽️
-          </div>
-          <h1 className="text-5xl font-extrabold tracking-tight gradient-text mb-3">
-            3C Foods
-          </h1>
-          <p className="text-slate-400 text-base font-medium">
-            Discover your top 3 picks — by cuisine, mood, or craving
-          </p>
+        <div className="text-center mb-10 fade-up">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl glass text-3xl mb-5 shadow-xl">🍽️</div>
+          <h1 className="text-5xl font-black tracking-tight gradient-text mb-2">3C Foods</h1>
+          <p className="text-slate-400 text-base">Discover the top 3 dishes for any cuisine or craving</p>
         </div>
 
-        {/* Search bar */}
-        <div className="flex gap-3 mb-5 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch(query)}
-            placeholder="Type a cuisine or mood…"
-            className="glow-input flex-1 glass rounded-2xl px-5 py-4 text-white text-base placeholder-slate-500 outline-none transition-all duration-200"
-          />
-          <button
-            onClick={() => handleSearch(query)}
-            className="btn-primary text-white font-bold px-7 py-4 rounded-2xl whitespace-nowrap shadow-lg"
-          >
-            Find ✦
+        {/* Search */}
+        <div className="flex gap-3 mb-6 fade-up" style={{ animationDelay: "0.08s" }}>
+          <div className="relative flex-1">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg">🔍</span>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch(query)}
+              placeholder="Search cuisine, ingredient, or mood…"
+              className="search-input glass w-full rounded-2xl pl-11 pr-10 py-4 text-white text-base placeholder-slate-500 outline-none transition-all"
+            />
+            {query && (
+              <button onClick={handleClear} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xl transition-colors">×</button>
+            )}
+          </div>
+          <button onClick={() => handleSearch(query)} className="btn-find text-white font-bold px-7 py-4 rounded-2xl shadow-lg shrink-0">
+            Find
           </button>
         </div>
 
-        {/* Suggestion chips */}
-        <div className="flex flex-wrap gap-2 mb-10 animate-fade-up" style={{ animationDelay: "0.15s" }}>
-          {SUGGESTIONS.map((s) => (
+        {/* Quick chips */}
+        <div className="flex flex-wrap gap-2 mb-10 fade-up" style={{ animationDelay: "0.12s" }}>
+          {["🔥 Spicy","🥗 Vegetarian","🍛 Indian","🍕 Italian","🌮 Mexican","🍣 Japanese","🍜 Thai","🥟 Chinese"].map((s) => (
             <button
-              key={s.value}
-              onClick={() => handleSearch(s.value)}
-              className="chip text-slate-300 text-sm font-medium px-4 py-1.5 rounded-full cursor-pointer"
+              key={s}
+              onClick={() => handleSearch(s.split(" ")[1])}
+              className="chip text-slate-300 text-sm font-medium px-4 py-1.5 rounded-full"
             >
-              {s.label}
+              {s}
             </button>
           ))}
         </div>
 
-        {/* Results */}
-        {searched && results.length === 0 && (
-          <div key={resultKey} className="text-center py-16 animate-fade-up glass rounded-3xl">
-            <span className="text-5xl block mb-4">🤔</span>
-            <p className="text-slate-400">
-              No results for <span className="text-white font-semibold">&quot;{submitted}&quot;</span>
-            </p>
-            <p className="text-slate-600 text-sm mt-1">Try Indian, Spicy, or Vegetarian</p>
-          </div>
-        )}
-
-        {results.length > 0 && (
-          <div key={resultKey} className="space-y-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-5 animate-fade-up">
-              Top 3 picks for &nbsp;
-              <span className="text-orange-400">{submitted}</span>
-            </p>
-
-            {results.slice(0, 3).map((food, i) => (
-              <div
-                key={food.name}
-                className={`glass-card rounded-3xl p-5 flex items-center gap-5 animate-fade-up-${i + 1}`}
-              >
-                {/* Rank */}
-                <div className={`shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${RANK_COLORS[i]} flex items-center justify-center shadow-md`}>
-                  <span className="text-white text-xs font-bold">#{i + 1}</span>
-                </div>
-
-                {/* Emoji */}
-                <div className="text-4xl shrink-0 leading-none">{food.emoji}</div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <h2 className="text-white font-bold text-lg leading-tight truncate">{food.name}</h2>
-                  </div>
-                  <p className="text-slate-400 text-sm leading-snug">{food.desc}</p>
-                </div>
-
-                {/* Tag */}
-                <span className="shrink-0 text-xs font-semibold text-orange-400 bg-orange-400/10 border border-orange-400/20 px-3 py-1 rounded-full">
-                  {food.tag}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
+        {/* Browse grid — shown when not searched */}
         {!searched && (
-          <div className="text-center py-16 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            <p className="text-slate-600 text-sm">Start typing or pick a cuisine above</p>
+          <div key="browse" className="fade-up" style={{ animationDelay: "0.16s" }}>
+            <h2 className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-4">Browse Cuisines</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {CATEGORIES.map((cat) => (
+                <CatCard key={cat.value} cat={cat} onSelect={(v) => handleSearch(v)} />
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Footer */}
-        <p className="text-center text-slate-700 text-xs mt-14">
-          3C Foods — top 3 picks, every time
-        </p>
+        {/* No results */}
+        {searched && results.length === 0 && (
+          <div key={`empty-${key}`} className="text-center py-20 glass rounded-3xl scale-in">
+            <span className="text-5xl block mb-4">🤔</span>
+            <p className="text-white font-semibold text-lg mb-1">No results for &quot;{submitted}&quot;</p>
+            <p className="text-slate-500 text-sm mb-6">Try a cuisine like Indian, Italian, or Spicy</p>
+            <button onClick={handleClear} className="chip text-slate-300 px-5 py-2 rounded-full text-sm font-medium">
+              ← Back to browse
+            </button>
+          </div>
+        )}
+
+        {/* Results */}
+        {results.length > 0 && (
+          <div key={`results-${key}`}>
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Top picks for</p>
+                <p className="text-white font-bold text-xl capitalize">{submitted}</p>
+              </div>
+              <button onClick={handleClear} className="chip text-slate-400 text-sm px-4 py-1.5 rounded-full font-medium">
+                ← Back
+              </button>
+            </div>
+            <div className="space-y-5">
+              {results.slice(0, 3).map((food, i) => (
+                <FoodCard key={food.name} food={food} rank={i} delay={`${i * 0.08}s`} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <p className="text-center text-slate-700 text-xs mt-16">3C Foods — top 3 picks, every time</p>
       </div>
     </main>
   );
