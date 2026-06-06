@@ -6,7 +6,10 @@ import { getProfile } from "@/lib/db";
 const UNS = (q: string) =>
   `https://source.unsplash.com/featured/800x600/?${encodeURIComponent(q)}`;
 
-function buildSystemPrompt(profile: { dietary: string; spice_level: string; allergies: string | null } | null) {
+function buildSystemPrompt(
+  profile: { dietary: string; spice_level: string; allergies: string | null } | null,
+  city?: string,
+) {
   const prefs = profile && profile.dietary !== "none"
     ? `\nThe user has these dietary preferences — strictly follow them:
 - Dietary: ${profile.dietary}
@@ -14,8 +17,9 @@ function buildSystemPrompt(profile: { dietary: string; spice_level: string; alle
 - Avoid/allergies: ${profile.allergies || "none"}
 All 3 recommendations MUST comply with the above.`
     : "";
+  const loc = city ? `\nThe user is in ${city} — if relevant, prioritise locally popular dishes.` : "";
 
-  return `You are a food recommendation expert. When given a query, respond with exactly 3 food recommendations as valid JSON.${prefs}
+  return `You are a food recommendation expert. When given a query, respond with exactly 3 food recommendations as valid JSON.${prefs}${loc}
 
 Return ONLY this JSON structure — no preamble, no explanation, no markdown:
 {
@@ -34,7 +38,7 @@ The imgQuery should be 3-4 comma-separated keywords for finding a relevant food 
 }
 
 export async function POST(req: NextRequest) {
-  const { query } = await req.json();
+  const { query, city } = await req.json();
   if (!query?.trim()) {
     return NextResponse.json({ error: "Query required" }, { status: 400 });
   }
@@ -52,7 +56,7 @@ export async function POST(req: NextRequest) {
   const message = await client.messages.create({
     model: "claude-opus-4-8",
     max_tokens: 1024,
-    system: buildSystemPrompt(profile),
+    system: buildSystemPrompt(profile, city),
     messages: [
       { role: "user", content: `Recommend the top 3 foods for: "${query.trim()}"` },
     ],

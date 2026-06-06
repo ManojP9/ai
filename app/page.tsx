@@ -124,12 +124,55 @@ const RANK = [
   { label: "3rd", cls: "rank-bronze" },
 ];
 
+const DELIVERY = [
+  { label: "Uber Eats", emoji: "🚗", href: (q: string) => `https://www.ubereats.com/search?q=${encodeURIComponent(q)}` },
+  { label: "DoorDash",  emoji: "🚪", href: (q: string) => `https://www.doordash.com/search/store/${encodeURIComponent(q)}/` },
+  { label: "Instacart", emoji: "🛒", href: (q: string) => `https://www.instacart.com/store/s?k=${encodeURIComponent(q)}` },
+];
+
+function OrderNowButton({ foodName }: { foodName: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button
+        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        className="chip text-orange-300 text-xs font-semibold px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition-colors flex items-center gap-1"
+      >
+        🛵 Order Now
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-9 z-20 bg-[#0f0f1a] border border-white/10 rounded-xl overflow-hidden shadow-xl w-40">
+            {DELIVERY.map((d) => (
+              <a
+                key={d.label}
+                href={d.href(foodName)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+              >
+                <span>{d.emoji}</span>
+                <span>{d.label}</span>
+              </a>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function FoodCard({
-  food, rank, delay, isFaved, onToggleFave, saving,
+  food, rank, delay, isFaved, onToggleFave, saving, userLists, onAddToList,
 }: {
   food: Food; rank: number; delay: string;
   isFaved: boolean; onToggleFave: () => void; saving: boolean;
+  userLists: { id: number; title: string }[];
+  onAddToList: (food: Food, listId: number) => void;
 }) {
+  const [listOpen, setListOpen] = useState(false);
   return (
     <div className="food-card rounded-3xl fade-up" style={{ animationDelay: delay }}>
       <div className="relative w-full h-48 overflow-hidden">
@@ -166,7 +209,36 @@ function FoodCard({
           <span className="text-2xl">{food.emoji}</span>
           <h2 className="text-white font-bold text-xl">{food.name}</h2>
         </div>
-        <p className="text-slate-400 text-sm leading-relaxed">{food.desc}</p>
+        <p className="text-slate-400 text-sm leading-relaxed mb-3">{food.desc}</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <OrderNowButton foodName={food.name} />
+          {userLists.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={() => setListOpen((o) => !o)}
+                className="chip text-slate-400 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1"
+              >
+                📋 Save to list
+              </button>
+              {listOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setListOpen(false)} />
+                  <div className="absolute left-0 top-9 z-20 bg-[#0f0f1a] border border-white/10 rounded-xl overflow-hidden shadow-xl min-w-[160px]">
+                    {userLists.map((l) => (
+                      <button
+                        key={l.id}
+                        onClick={() => { onAddToList(food, l.id); setListOpen(false); }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors truncate"
+                      >
+                        {l.title}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -288,6 +360,9 @@ export default function Home() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [favorites, setFavorites] = useState<FavoriteRow[]>([]);
   const [savingName, setSavingName] = useState<string | null>(null);
+  const [city, setCity] = useState("");
+  const [locLoading, setLocLoading] = useState(false);
+  const [userLists, setUserLists] = useState<{ id: number; title: string }[]>([]);
   const posthog = usePostHog();
   const { data: session } = useSession();
 
@@ -311,6 +386,20 @@ export default function Home() {
         }
       } catch { /* db not connected yet */ }
       await loadFavorites();
+      // Load user lists for "Save to list" dropdowns
+      try {
+        const lr = await fetch("/api/lists");
+        if (lr.ok) {
+          const ld = await lr.json();
+          setUserLists((ld.lists ?? []).map((l: { id: number; title: string }) => ({ id: l.id, title: l.title })));
+        }
+      } catch {}
+      // Apply referral code from URL if present
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        fetch("/api/referral", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ref }) }).catch(() => {});
+      }
     }
     init();
   }, [loadFavorites]);
@@ -344,7 +433,7 @@ export default function Home() {
       const res = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: trimmed }),
+        body: JSON.stringify({ query: trimmed, city: city || undefined }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -454,6 +543,39 @@ export default function Home() {
     posthog?.capture("rate_food", { favorite_id: id, rating });
   }
 
+  async function detectLocation() {
+    if (!navigator.geolocation) return;
+    setLocLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`);
+          const data = await res.json();
+          const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.county || "";
+          setCity(cityName);
+          if (cityName) toast.success(`📍 ${cityName}`);
+        } catch {}
+        setLocLoading(false);
+      },
+      () => setLocLoading(false)
+    );
+  }
+
+  async function addToList(food: Food, listId: number) {
+    try {
+      const res = await fetch(`/api/lists/${listId}/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: food.name, desc: food.desc, emoji: food.emoji, tag: food.tag, img: food.img }),
+      });
+      if (res.ok) toast.success("Added to list!");
+      else toast.error("Failed to add");
+    } catch {
+      toast.error("Failed to add");
+    }
+  }
+
   const chips = recentSearches.length > 0
     ? recentSearches
     : ["Spicy", "Vegetarian", "Indian", "Italian", "Mexican", "Japanese", "Thai", "Chinese"];
@@ -469,12 +591,21 @@ export default function Home() {
 
         {/* Auth bar */}
         <div className="flex items-center justify-between mb-8 fade-up">
-          <div className="flex items-center gap-4">
-            <Link href="/progress" className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors">
-              <span>📊</span><span>Progress</span>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link href="/progress" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              <span>📊</span><span className="hidden sm:inline">Progress</span>
             </Link>
-            <Link href="/profile" className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors">
-              <span>⚙️</span><span>Profile</span>
+            <Link href="/profile" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              <span>⚙️</span><span className="hidden sm:inline">Profile</span>
+            </Link>
+            <Link href="/lists" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              <span>📋</span><span className="hidden sm:inline">Lists</span>
+            </Link>
+            <Link href="/leaderboard" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              <span>🏆</span><span className="hidden sm:inline">Top</span>
+            </Link>
+            <Link href="/metrics" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              <span>📈</span><span className="hidden sm:inline">Metrics</span>
             </Link>
           </div>
           <AuthButton />
@@ -506,6 +637,24 @@ export default function Home() {
           <button onClick={() => handleSearch(query)} className="btn-find text-white font-bold px-7 py-4 rounded-2xl shadow-lg shrink-0">
             Find
           </button>
+        </div>
+
+        {/* Location row */}
+        <div className="flex items-center gap-2 mb-4 -mt-2 fade-up" style={{ animationDelay: "0.10s" }}>
+          <button
+            onClick={detectLocation}
+            disabled={locLoading}
+            className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors disabled:opacity-50"
+          >
+            <span>{locLoading ? "…" : "📍"}</span>
+            <span>{city || "Use my location"}</span>
+          </button>
+          {city && (
+            <button onClick={() => setCity("")} className="text-slate-700 hover:text-slate-500 text-xs transition-colors">×</button>
+          )}
+          <Link href="/claim" className="ml-auto text-xs text-slate-700 hover:text-slate-500 transition-colors">
+            Own a restaurant? Claim →
+          </Link>
         </div>
 
         {/* Quick chips — recent searches or defaults */}
@@ -614,6 +763,8 @@ export default function Home() {
                   isFaved={isFaved(food)}
                   onToggleFave={() => toggleFave(food)}
                   saving={savingName === food.name}
+                  userLists={userLists}
+                  onAddToList={addToList}
                 />
               ))}
             </div>

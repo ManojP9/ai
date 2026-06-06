@@ -29,6 +29,8 @@ export default function ProfilePage() {
   const [allergies, setAllergies] = useState("");
   const [saving, setSaving]       = useState(false);
   const [loaded, setLoaded]       = useState(false);
+  const [refCode, setRefCode]     = useState("");
+  const [refCount, setRefCount]   = useState(0);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -43,6 +45,11 @@ export default function ProfilePage() {
         setLoaded(true);
       })
       .catch(() => setLoaded(true));
+    // Load referral code
+    fetch("/api/referral")
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d) { setRefCode(d.code); setRefCount(d.count); } })
+      .catch(() => {});
   }, [status]);
 
   async function handleSave() {
@@ -179,6 +186,29 @@ export default function ProfilePage() {
                 <p className="text-violet-300 text-xs leading-relaxed">
                   Claude will now tailor every recommendation to your <strong>{dietary}</strong> preference and <strong>{spice}</strong> spice level.
                 </p>
+              </div>
+            )}
+
+            {/* Referral */}
+            {refCode && (
+              <div className="glass rounded-2xl p-5">
+                <h2 className="text-white font-semibold text-sm mb-1">Referral Link</h2>
+                <p className="text-slate-600 text-xs mb-3">Share 3C Foods · {refCount} friend{refCount !== 1 ? "s" : ""} joined via your link</p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 bg-white/5 text-orange-300 text-xs rounded-lg px-3 py-2 truncate font-mono">
+                    {typeof window !== "undefined" ? `${window.location.origin}?ref=${refCode}` : `...?ref=${refCode}`}
+                  </code>
+                  <button
+                    onClick={async () => {
+                      const url = `${window.location.origin}?ref=${refCode}`;
+                      await navigator.clipboard.writeText(url);
+                      toast.success("📋 Copied!");
+                    }}
+                    className="chip text-slate-400 text-xs px-3 py-2 rounded-lg font-medium shrink-0"
+                  >
+                    Copy
+                  </button>
+                </div>
               </div>
             )}
 
