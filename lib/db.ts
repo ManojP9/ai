@@ -79,6 +79,8 @@ export async function removeFavorite(id: number) {
 
 // ── version1: phasewise feature roadmap ──────────────────────────────────────
 
+export type TaskStatus = "pending" | "in_progress" | "done" | "error";
+
 export type Version1Row = {
   id: number;
   parent_id: number | null;
@@ -86,6 +88,8 @@ export type Version1Row = {
   description: string | null;
   phase: number | null;
   order_index: number;
+  status: TaskStatus;
+  error_note: string | null;
   created_at: string;
 };
 
@@ -100,8 +104,22 @@ export async function initVersion1() {
       description TEXT,
       phase       INTEGER,
       order_index INTEGER DEFAULT 0,
+      status      TEXT NOT NULL DEFAULT 'pending',
+      error_note  TEXT,
       created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )
+  `;
+  // safe migration for existing tables created before status/error_note columns
+  await sql`ALTER TABLE version1 ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending'`;
+  await sql`ALTER TABLE version1 ADD COLUMN IF NOT EXISTS error_note TEXT`;
+}
+
+export async function updateVersion1Task(id: number, status: TaskStatus, error_note?: string) {
+  await initVersion1();
+  await sql`
+    UPDATE version1
+    SET status = ${status}, error_note = ${error_note ?? null}
+    WHERE id = ${id}
   `;
 }
 

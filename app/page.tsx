@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 
 interface Food {
   name: string;
@@ -366,6 +367,9 @@ export default function Home() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl glass text-3xl mb-5 shadow-xl">🍽️</div>
           <h1 className="text-5xl font-black tracking-tight gradient-text mb-2">3C Foods</h1>
           <p className="text-slate-400 text-base">Discover the top 3 dishes for any cuisine or craving</p>
+          <Link href="/progress" className="inline-flex items-center gap-1.5 mt-3 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+            <span>📊</span><span>Build Progress</span>
+          </Link>
         </div>
 
         {/* Search */}
