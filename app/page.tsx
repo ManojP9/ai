@@ -164,16 +164,43 @@ export default function Home() {
   const [submitted, setSubmitted] = useState("");
   const [results, setResults] = useState<Food[]>([]);
   const [searched, setSearched] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [aiPowered, setAiPowered] = useState(false);
   const [key, setKey] = useState(0);
 
-  function handleSearch(q: string) {
+  async function handleSearch(q: string) {
     const trimmed = q.trim();
     if (!trimmed) return;
     setQuery(trimmed);
     setSubmitted(trimmed);
-    setResults(getRecommendations(trimmed));
     setSearched(true);
+    setLoading(true);
+    setAiPowered(false);
+    setResults([]);
     setKey((k) => k + 1);
+
+    try {
+      const res = await fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: trimmed }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.foods?.length > 0) {
+          setResults(data.foods);
+          setAiPowered(true);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch {
+      // fall through to local results
+    }
+
+    setResults(getRecommendations(trimmed));
+    setAiPowered(false);
+    setLoading(false);
   }
 
   function handleClear() {
@@ -181,6 +208,8 @@ export default function Home() {
     setSubmitted("");
     setResults([]);
     setSearched(false);
+    setLoading(false);
+    setAiPowered(false);
   }
 
   return (
@@ -245,8 +274,17 @@ export default function Home() {
           </div>
         )}
 
+        {/* Loading state */}
+        {searched && loading && (
+          <div key={`loading-${key}`} className="text-center py-20 glass rounded-3xl scale-in">
+            <div className="text-5xl mb-4 animate-pulse">🤖</div>
+            <p className="text-white font-semibold text-lg">Claude is thinking…</p>
+            <p className="text-slate-500 text-sm mt-1">Finding the best picks for &quot;{submitted}&quot;</p>
+          </div>
+        )}
+
         {/* No results */}
-        {searched && results.length === 0 && (
+        {searched && !loading && results.length === 0 && (
           <div key={`empty-${key}`} className="text-center py-20 glass rounded-3xl scale-in">
             <span className="text-5xl block mb-4">🤔</span>
             <p className="text-white font-semibold text-lg mb-1">No results for &quot;{submitted}&quot;</p>
@@ -258,12 +296,19 @@ export default function Home() {
         )}
 
         {/* Results */}
-        {results.length > 0 && (
+        {!loading && results.length > 0 && (
           <div key={`results-${key}`}>
             <div className="flex items-center justify-between mb-5">
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Top picks for</p>
-                <p className="text-white font-bold text-xl capitalize">{submitted}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-white font-bold text-xl capitalize">{submitted}</p>
+                  {aiPowered && (
+                    <span className="text-xs font-semibold bg-violet-500/20 text-violet-300 px-2.5 py-0.5 rounded-full border border-violet-500/30">
+                      ✨ AI
+                    </span>
+                  )}
+                </div>
               </div>
               <button onClick={handleClear} className="chip text-slate-400 text-sm px-4 py-1.5 rounded-full font-medium">
                 ← Back
