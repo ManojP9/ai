@@ -327,12 +327,14 @@ function TaskRow({ task, depth, onStatusChange, onErrorNote }: {
   );
 }
 
-function PhaseCard({ phase, colorCls, onStatusChange, onErrorNote }: {
+function PhaseCard({ phase, colorCls, onStatusChange, onErrorNote, onMarkPhaseDone }: {
   phase: Task; colorCls: string;
   onStatusChange: (id: number, status: Status, note?: string) => void;
   onErrorNote: (task: Task) => void;
+  onMarkPhaseDone: (phaseNum: number) => void;
 }) {
   const [open, setOpen] = useState(true);
+  const [marking, setMarking] = useState(false);
   const tasks = phase.children;
   const done = tasks.filter((t) => t.status === "done").length;
   const errors = tasks.filter((t) => t.status === "error").length;
@@ -340,6 +342,14 @@ function PhaseCard({ phase, colorCls, onStatusChange, onErrorNote }: {
   const pIdx = phaseIndex(phase.phase);
   const barColor = PHASE_BAR_COLORS[pIdx];
   const pct = tasks.length === 0 ? 0 : Math.round((done / tasks.length) * 100);
+  const allDone = done === tasks.length && tasks.length > 0;
+
+  async function handleMarkDone(e: React.MouseEvent) {
+    e.stopPropagation();
+    setMarking(true);
+    await onMarkPhaseDone(phase.phase!);
+    setMarking(false);
+  }
 
   return (
     <div className={`rounded-2xl border bg-gradient-to-br ${colorCls} overflow-hidden`}>
@@ -357,6 +367,15 @@ function PhaseCard({ phase, colorCls, onStatusChange, onErrorNote }: {
             </div>
             <span className="text-xs text-slate-500 shrink-0">{done}/{tasks.length}</span>
           </div>
+          {!allDone && (
+            <button
+              onClick={handleMarkDone}
+              disabled={marking}
+              className="mt-3 text-xs px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/25 transition-colors disabled:opacity-50"
+            >
+              {marking ? "Marking…" : "✓ Mark phase done"}
+            </button>
+          )}
         </div>
         <span className="text-slate-500 text-lg mt-0.5 shrink-0">{open ? "▲" : "▼"}</span>
       </button>
@@ -405,6 +424,22 @@ export default function ProgressPage() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, error_note: note ?? null }),
+    });
+  }
+
+  async function handleMarkPhaseDone(phaseNum: number) {
+    // Optimistic update
+    setPhases((prev) =>
+      prev.map((p) =>
+        p.phase === phaseNum
+          ? { ...p, children: p.children.map((t) => ({ ...t, status: "done" as Status })) }
+          : p
+      )
+    );
+    await fetch("/api/version1", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phase: phaseNum, status: "done" }),
     });
   }
 
@@ -544,6 +579,7 @@ export default function ProgressPage() {
                       colorCls={PHASE_COLORS[phaseIndex(phase.phase)]}
                       onStatusChange={handleStatusChange}
                       onErrorNote={(task) => setErrorModal(task)}
+                      onMarkPhaseDone={handleMarkPhaseDone}
                     />
                   ))}
                 </div>
