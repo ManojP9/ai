@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { addFavorite, getFavorites } from "@/lib/db";
+import { auth } from "@/auth";
 
 export async function GET() {
-  const favorites = await getFavorites();
+  const session = await auth();
+  const userId = session?.user?.email ?? undefined;
+  const favorites = await getFavorites(userId);
   return NextResponse.json({ favorites });
 }
 
@@ -11,6 +14,8 @@ export async function POST(req: NextRequest) {
   if (!food?.name) {
     return NextResponse.json({ error: "Food data required" }, { status: 400 });
   }
-  const result = await addFavorite(food);
+  const session = await auth();
+  const userId = session?.user?.email ?? undefined;
+  const result = await addFavorite(food, userId);
   return NextResponse.json({ id: result.id });
 }

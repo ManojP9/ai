@@ -19,15 +19,29 @@ export async function initDb() {
       saved_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )
   `;
+  // Phase 1 migration: add user_id to searches and favorites
+  await sql`ALTER TABLE searches  ADD COLUMN IF NOT EXISTS user_id TEXT`;
+  await sql`ALTER TABLE favorites ADD COLUMN IF NOT EXISTS user_id TEXT`;
 }
 
-export async function logSearch(query: string) {
+export async function logSearch(query: string, userId?: string) {
   await initDb();
-  await sql`INSERT INTO searches (query) VALUES (${query})`;
+  await sql`INSERT INTO searches (query, user_id) VALUES (${query}, ${userId ?? null})`;
 }
 
-export async function getRecentSearches(limit = 8) {
+export async function getRecentSearches(limit = 8, userId?: string) {
   await initDb();
+  if (userId) {
+    const { rows } = await sql`
+      SELECT DISTINCT ON (lower(query)) query, MAX(searched_at) as last_searched
+      FROM searches
+      WHERE user_id = ${userId}
+      GROUP BY lower(query)
+      ORDER BY MAX(searched_at) DESC
+      LIMIT ${limit}
+    `;
+    return rows as { query: string; last_searched: string }[];
+  }
   const { rows } = await sql`
     SELECT DISTINCT ON (lower(query)) query, MAX(searched_at) as last_searched
     FROM searches
@@ -48,27 +62,28 @@ export type FavoriteRow = {
   saved_at: string;
 };
 
-export async function addFavorite(food: {
-  name: string;
-  desc: string;
-  emoji: string;
-  tag: string;
-  img: string;
-}) {
+export async function addFavorite(
+  food: { name: string; desc: string; emoji: string; tag: string; img: string },
+  userId?: string,
+) {
   await initDb();
   const { rows } = await sql`
-    INSERT INTO favorites (food_name, food_desc, food_emoji, food_tag, food_img)
-    VALUES (${food.name}, ${food.desc}, ${food.emoji}, ${food.tag}, ${food.img})
+    INSERT INTO favorites (food_name, food_desc, food_emoji, food_tag, food_img, user_id)
+    VALUES (${food.name}, ${food.desc}, ${food.emoji}, ${food.tag}, ${food.img}, ${userId ?? null})
     RETURNING id
   `;
   return rows[0] as { id: number };
 }
 
-export async function getFavorites() {
+export async function getFavorites(userId?: string) {
   await initDb();
-  const { rows } = await sql`
-    SELECT * FROM favorites ORDER BY saved_at DESC
-  `;
+  if (userId) {
+    const { rows } = await sql`
+      SELECT * FROM favorites WHERE user_id = ${userId} ORDER BY saved_at DESC
+    `;
+    return rows as FavoriteRow[];
+  }
+  const { rows } = await sql`SELECT * FROM favorites ORDER BY saved_at DESC`;
   return rows as FavoriteRow[];
 }
 

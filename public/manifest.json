@@ -1,0 +1,20 @@
+{
+  "name": "3C Foods",
+  "short_name": "3C Foods",
+  "description": "Discover your top 3 food picks for any cuisine or craving",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07070f",
+  "theme_color": "#07070f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle"],
+  "lang": "en"
+}
