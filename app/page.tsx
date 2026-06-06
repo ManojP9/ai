@@ -21,6 +21,8 @@ interface FavoriteRow {
   food_emoji: string;
   food_tag: string;
   food_img: string;
+  rating: number | null;
+  tried_at: string | null;
 }
 
 const UNS = (q: string) =>
@@ -170,7 +172,28 @@ function FoodCard({
   );
 }
 
-function FaveCard({ fav, onRemove }: { fav: FavoriteRow; onRemove: () => void }) {
+function StarRating({ favId, current, onRate }: { favId: number; current: number | null; onRate: (id: number, r: number) => void }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <button
+          key={s}
+          onClick={() => onRate(favId, s)}
+          onMouseEnter={() => setHover(s)}
+          onMouseLeave={() => setHover(0)}
+          className="text-base transition-transform hover:scale-125"
+          title={`Rate ${s} star${s > 1 ? "s" : ""}`}
+        >
+          <span className={(hover || current || 0) >= s ? "text-yellow-400" : "text-slate-700"}>★</span>
+        </button>
+      ))}
+      {current && <span className="text-slate-600 text-xs ml-1">Tried ✓</span>}
+    </div>
+  );
+}
+
+function FaveCard({ fav, onRemove, onRate }: { fav: FavoriteRow; onRemove: () => void; onRate: (id: number, r: number) => void }) {
   return (
     <div className="food-card rounded-2xl flex gap-3 overflow-hidden">
       <div className="relative w-20 h-20 shrink-0">
@@ -191,7 +214,10 @@ function FaveCard({ fav, onRemove }: { fav: FavoriteRow; onRemove: () => void })
             ❤️
           </button>
         </div>
-        <p className="text-slate-500 text-xs mt-0.5 leading-relaxed line-clamp-2">{fav.food_desc}</p>
+        <p className="text-slate-500 text-xs mt-0.5 leading-relaxed line-clamp-1">{fav.food_desc}</p>
+        <div className="mt-1.5">
+          <StarRating favId={fav.id} current={fav.rating} onRate={onRate} />
+        </div>
       </div>
     </div>
   );
@@ -257,11 +283,13 @@ export default function Home() {
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [aiPowered, setAiPowered] = useState(false);
+  const [personalized, setPersonalized] = useState(false);
   const [key, setKey] = useState(0);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [favorites, setFavorites] = useState<FavoriteRow[]>([]);
   const [savingName, setSavingName] = useState<string | null>(null);
   const posthog = usePostHog();
+  const { data: session } = useSession();
 
   const loadFavorites = useCallback(async () => {
     try {
@@ -323,8 +351,9 @@ export default function Home() {
         if (data.foods?.length > 0) {
           setResults(data.foods);
           setAiPowered(true);
+          setPersonalized(!!data.personalized);
           setLoading(false);
-          posthog?.capture("search", { query: trimmed, result_count: data.foods.length, ai_powered: true });
+          posthog?.capture("search", { query: trimmed, result_count: data.foods.length, ai_powered: true, personalized: !!data.personalized });
           return;
         }
       }
@@ -335,6 +364,7 @@ export default function Home() {
     const local = getRecommendations(trimmed);
     setResults(local);
     setAiPowered(false);
+    setPersonalized(false);
     setLoading(false);
     posthog?.capture("search", { query: trimmed, result_count: local.length, ai_powered: false });
   }
@@ -361,6 +391,7 @@ export default function Home() {
     setSearched(false);
     setLoading(false);
     setAiPowered(false);
+    setPersonalized(false);
   }
 
   function isFaved(food: Food) {
@@ -395,6 +426,8 @@ export default function Home() {
             food_emoji: food.emoji,
             food_tag: food.tag,
             food_img: food.img,
+            rating: null,
+            tried_at: null,
           };
           setFavorites((prev) => [newFav, ...prev]);
           posthog?.capture("favorite_add", { food_name: food.name, food_tag: food.tag });
@@ -409,6 +442,16 @@ export default function Home() {
       await fetch(`/api/favorites/${id}`, { method: "DELETE" });
       setFavorites((prev) => prev.filter((f) => f.id !== id));
     } catch { /* ignore */ }
+  }
+
+  async function rateFood(id: number, rating: number) {
+    setFavorites((prev) => prev.map((f) => f.id === id ? { ...f, rating, tried_at: new Date().toISOString() } : f));
+    await fetch(`/api/favorites/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rating }),
+    }).catch(() => {});
+    posthog?.capture("rate_food", { favorite_id: id, rating });
   }
 
   const chips = recentSearches.length > 0
@@ -426,9 +469,14 @@ export default function Home() {
 
         {/* Auth bar */}
         <div className="flex items-center justify-between mb-8 fade-up">
-          <Link href="/progress" className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors">
-            <span>📊</span><span>Build Progress</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/progress" className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              <span>📊</span><span>Progress</span>
+            </Link>
+            <Link href="/profile" className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              <span>⚙️</span><span>Profile</span>
+            </Link>
+          </div>
           <AuthButton />
         </div>
 
@@ -463,7 +511,9 @@ export default function Home() {
         {/* Quick chips — recent searches or defaults */}
         <div className="flex flex-wrap gap-2 mb-10 fade-up" style={{ animationDelay: "0.12s" }}>
           {recentSearches.length > 0 && (
-            <span className="text-slate-600 text-xs self-center mr-1">Recent:</span>
+            <span className="text-slate-600 text-xs self-center mr-1">
+              {session ? "Your searches:" : "Recent:"}
+            </span>
           )}
           {chips.slice(0, 8).map((s) => (
             <button
@@ -487,7 +537,7 @@ export default function Home() {
                 </h2>
                 <div className="space-y-3">
                   {favorites.map((fav) => (
-                    <FaveCard key={fav.id} fav={fav} onRemove={() => removeFave(fav.id)} />
+                    <FaveCard key={fav.id} fav={fav} onRemove={() => removeFave(fav.id)} onRate={rateFood} />
                   ))}
                 </div>
               </div>
@@ -536,7 +586,7 @@ export default function Home() {
                   <p className="text-white font-bold text-xl capitalize">{submitted}</p>
                   {aiPowered && (
                     <span className="text-xs font-semibold bg-violet-500/20 text-violet-300 px-2.5 py-0.5 rounded-full border border-violet-500/30">
-                      ✨ AI
+                      {personalized ? "✨ Personalized" : "✨ AI"}
                     </span>
                   )}
                 </div>

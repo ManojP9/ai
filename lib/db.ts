@@ -19,9 +19,12 @@ export async function initDb() {
       saved_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )
   `;
-  // Phase 1 migration: add user_id to searches and favorites
+  // Phase 1: user_id on searches + favorites
   await sql`ALTER TABLE searches  ADD COLUMN IF NOT EXISTS user_id TEXT`;
   await sql`ALTER TABLE favorites ADD COLUMN IF NOT EXISTS user_id TEXT`;
+  // Phase 2: ratings on favorites
+  await sql`ALTER TABLE favorites ADD COLUMN IF NOT EXISTS rating INTEGER CHECK (rating BETWEEN 1 AND 5)`;
+  await sql`ALTER TABLE favorites ADD COLUMN IF NOT EXISTS tried_at TIMESTAMPTZ`;
 }
 
 export async function logSearch(query: string, userId?: string) {
@@ -60,6 +63,8 @@ export type FavoriteRow = {
   food_tag: string;
   food_img: string;
   saved_at: string;
+  rating: number | null;
+  tried_at: string | null;
 };
 
 export async function addFavorite(
@@ -90,6 +95,76 @@ export async function getFavorites(userId?: string) {
 export async function removeFavorite(id: number) {
   await initDb();
   await sql`DELETE FROM favorites WHERE id = ${id}`;
+}
+
+export async function rateFood(id: number, rating: number) {
+  await initDb();
+  await sql`
+    UPDATE favorites SET rating = ${rating}, tried_at = NOW() WHERE id = ${id}
+  `;
+}
+
+// ── profiles ─────────────────────────────────────────────────────────────────
+
+export type Profile = {
+  user_id: string;
+  dietary: string;
+  spice_level: string;
+  allergies: string | null;
+  updated_at: string;
+};
+
+export async function initProfiles() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS profiles (
+      user_id     TEXT PRIMARY KEY,
+      dietary     TEXT NOT NULL DEFAULT 'none',
+      spice_level TEXT NOT NULL DEFAULT 'medium',
+      allergies   TEXT,
+      updated_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+}
+
+export async function getProfile(userId: string): Promise<Profile | null> {
+  await initProfiles();
+  const { rows } = await sql`SELECT * FROM profiles WHERE user_id = ${userId}`;
+  return (rows[0] as Profile) ?? null;
+}
+
+export async function upsertProfile(
+  userId: string,
+  data: { dietary: string; spice_level: string; allergies: string }
+) {
+  await initProfiles();
+  await sql`
+    INSERT INTO profiles (user_id, dietary, spice_level, allergies, updated_at)
+    VALUES (${userId}, ${data.dietary}, ${data.spice_level}, ${data.allergies || null}, NOW())
+    ON CONFLICT (user_id) DO UPDATE
+      SET dietary = EXCLUDED.dietary,
+          spice_level = EXCLUDED.spice_level,
+          allergies = EXCLUDED.allergies,
+          updated_at = NOW()
+  `;
+}
+
+export async function getAllProfiles(): Promise<Profile[]> {
+  await initProfiles();
+  const { rows } = await sql`SELECT * FROM profiles`;
+  return rows as Profile[];
+}
+
+export async function getUserFavoriteTags(userId: string): Promise<string[]> {
+  await initDb();
+  const { rows } = await sql`
+    SELECT food_tag, COUNT(*)::int AS cnt
+    FROM favorites
+    WHERE user_id = ${userId}
+    GROUP BY food_tag
+    ORDER BY cnt DESC
+    LIMIT 3
+  `;
+  return rows.map((r) => r.food_tag as string);
 }
 
 // ── version1: phasewise feature roadmap ──────────────────────────────────────

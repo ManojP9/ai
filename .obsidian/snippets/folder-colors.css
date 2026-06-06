@@ -1,0 +1,69 @@
+/* ── 3C Foods · Phase Folder Colors ──────────────────────────────────────── */
+
+/* Phase 1 — Real Product · Orange */
+.nav-folder-title[data-path^="Phase 1"] {
+  color: #f97316 !important;
+  font-weight: 700;
+}
+.nav-folder-title[data-path^="Phase 1"] .nav-folder-title-content::before {
+  content: "🟠 ";
+}
+
+/* Phase 2 — Personalization · Violet */
+.nav-folder-title[data-path^="Phase 2"] {
+  color: #a78bfa !important;
+  font-weight: 700;
+}
+.nav-folder-title[data-path^="Phase 2"] .nav-folder-title-content::before {
+  content: "🟣 ";
+}
+
+/* Phase 3 — Monetization · Emerald */
+.nav-folder-title[data-path^="Phase 3"] {
+  color: #34d399 !important;
+  font-weight: 700;
+}
+.nav-folder-title[data-path^="Phase 3"] .nav-folder-title-content::before {
+  content: "🟢 ";
+}
+
+/* Phase 4 — Growth Loops · Blue */
+.nav-folder-title[data-path^="Phase 4"] {
+  color: #60a5fa !important;
+  font-weight: 700;
+}
+.nav-folder-title[data-path^="Phase 4"] .nav-folder-title-content::before {
+  content: "🔵 ";
+}
+
+/* Phase 5 — YC Ready · Pink */
+.nav-folder-title[data-path^="Phase 5"] {
+  color: #f472b6 !important;
+  font-weight: 700;
+}
+.nav-folder-title[data-path^="Phase 5"] .nav-folder-title-content::before {
+  content: "🩷 ";
+}
+
+/* wiki — Slate */
+.nav-folder-title[data-path^="wiki"] {
+  color: #94a3b8 !important;
+  font-weight: 700;
+}
+.nav-folder-title[data-path^="wiki"] .nav-folder-title-content::before {
+  content: "📖 ";
+}
+
+/* raw — Gray */
+.nav-folder-title[data-path^="raw"] {
+  color: #64748b !important;
+}
+.nav-folder-title[data-path^="raw"] .nav-folder-title-content::before {
+  content: "🗄️ ";
+}
+
+/* ── Status tag colors in reading view ───────────────────────────────────── */
+.tag[href="#status/done"]        { background: #34d39920; color: #34d399; border-color: #34d39940; }
+.tag[href="#status/active"]      { background: #facc1520; color: #facc15; border-color: #facc1540; }
+.tag[href="#status/blocked"]     { background: #f8717120; color: #f87171; border-color: #f8717140; }
+.tag[href="#status/pending"]     { background: #33415540; color: #94a3b8; border-color: #33415560; }
