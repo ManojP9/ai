@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect, useCallback } from "react";
 
 interface Food {
   name: string;
@@ -9,6 +8,15 @@ interface Food {
   emoji: string;
   tag: string;
   img: string;
+}
+
+interface FavoriteRow {
+  id: number;
+  food_name: string;
+  food_desc: string;
+  food_emoji: string;
+  food_tag: string;
+  food_img: string;
 }
 
 const UNS = (q: string) =>
@@ -110,10 +118,14 @@ const RANK = [
   { label: "3rd", cls: "rank-bronze" },
 ];
 
-function FoodCard({ food, rank, delay }: { food: Food; rank: number; delay: string }) {
+function FoodCard({
+  food, rank, delay, isFaved, onToggleFave, saving,
+}: {
+  food: Food; rank: number; delay: string;
+  isFaved: boolean; onToggleFave: () => void; saving: boolean;
+}) {
   return (
-    <div className={`food-card rounded-3xl fade-up`} style={{ animationDelay: delay }}>
-      {/* Image */}
+    <div className="food-card rounded-3xl fade-up" style={{ animationDelay: delay }}>
       <div className="relative w-full h-48 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -123,22 +135,59 @@ function FoodCard({ food, rank, delay }: { food: Food; rank: number; delay: stri
           onError={(e) => { (e.currentTarget as HTMLImageElement).src = ""; e.currentTarget.style.display = "none"; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        {/* Rank badge on image */}
         <span className={`absolute top-3 left-3 ${RANK[rank].cls} text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}>
           {RANK[rank].label}
         </span>
-        {/* Tag on image */}
         <span className="absolute top-3 right-3 bg-black/50 backdrop-blur text-white text-xs font-medium px-3 py-1 rounded-full border border-white/10">
           {food.tag}
         </span>
+        {/* Favorite button */}
+        <button
+          onClick={onToggleFave}
+          disabled={saving}
+          title={isFaved ? "Remove from favorites" : "Save to favorites"}
+          className={`absolute bottom-3 right-3 w-9 h-9 flex items-center justify-center rounded-full text-lg transition-all shadow-lg
+            ${isFaved
+              ? "bg-red-500/90 text-white scale-110"
+              : "bg-black/50 backdrop-blur text-slate-300 hover:bg-red-500/70 hover:text-white"}
+            ${saving ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
+        >
+          {isFaved ? "❤️" : "🤍"}
+        </button>
       </div>
-      {/* Content */}
       <div className="p-5">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-2xl">{food.emoji}</span>
           <h2 className="text-white font-bold text-xl">{food.name}</h2>
         </div>
         <p className="text-slate-400 text-sm leading-relaxed">{food.desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function FaveCard({ fav, onRemove }: { fav: FavoriteRow; onRemove: () => void }) {
+  return (
+    <div className="food-card rounded-2xl flex gap-3 overflow-hidden">
+      <div className="relative w-20 h-20 shrink-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={fav.food_img} alt={fav.food_name} className="w-full h-full object-cover" />
+      </div>
+      <div className="flex-1 py-3 pr-3 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-xl">{fav.food_emoji}</span>
+            <span className="text-white font-semibold text-sm truncate">{fav.food_name}</span>
+          </div>
+          <button
+            onClick={onRemove}
+            title="Remove favorite"
+            className="text-red-400 hover:text-red-300 text-lg shrink-0 transition-colors"
+          >
+            ❤️
+          </button>
+        </div>
+        <p className="text-slate-500 text-xs mt-0.5 leading-relaxed line-clamp-2">{fav.food_desc}</p>
       </div>
     </div>
   );
@@ -167,6 +216,33 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [aiPowered, setAiPowered] = useState(false);
   const [key, setKey] = useState(0);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteRow[]>([]);
+  const [savingName, setSavingName] = useState<string | null>(null);
+
+  const loadFavorites = useCallback(async () => {
+    try {
+      const res = await fetch("/api/favorites");
+      if (res.ok) {
+        const data = await res.json();
+        setFavorites(data.favorites ?? []);
+      }
+    } catch { /* db not connected yet */ }
+  }, []);
+
+  useEffect(() => {
+    async function init() {
+      try {
+        const res = await fetch("/api/searches");
+        if (res.ok) {
+          const data = await res.json();
+          setRecentSearches((data.searches ?? []).map((s: { query: string }) => s.query));
+        }
+      } catch { /* db not connected yet */ }
+      await loadFavorites();
+    }
+    init();
+  }, [loadFavorites]);
 
   async function handleSearch(q: string) {
     const trimmed = q.trim();
@@ -178,6 +254,20 @@ export default function Home() {
     setAiPowered(false);
     setResults([]);
     setKey((k) => k + 1);
+
+    // Log search (fire-and-forget)
+    fetch("/api/searches", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: trimmed }),
+    }).then(async (r) => {
+      if (r.ok) {
+        setRecentSearches((prev) => {
+          const deduped = [trimmed, ...prev.filter((s) => s.toLowerCase() !== trimmed.toLowerCase())];
+          return deduped.slice(0, 8);
+        });
+      }
+    }).catch(() => {});
 
     try {
       const res = await fetch("/api/recommend", {
@@ -211,6 +301,56 @@ export default function Home() {
     setLoading(false);
     setAiPowered(false);
   }
+
+  function isFaved(food: Food) {
+    return favorites.some((f) => f.food_name === food.name);
+  }
+
+  function favId(food: Food) {
+    return favorites.find((f) => f.food_name === food.name)?.id;
+  }
+
+  async function toggleFave(food: Food) {
+    if (savingName) return;
+    setSavingName(food.name);
+    try {
+      const id = favId(food);
+      if (id != null) {
+        await fetch(`/api/favorites/${id}`, { method: "DELETE" });
+        setFavorites((prev) => prev.filter((f) => f.id !== id));
+      } else {
+        const res = await fetch("/api/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(food),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const newFav: FavoriteRow = {
+            id: data.id,
+            food_name: food.name,
+            food_desc: food.desc,
+            food_emoji: food.emoji,
+            food_tag: food.tag,
+            food_img: food.img,
+          };
+          setFavorites((prev) => [newFav, ...prev]);
+        }
+      }
+    } catch { /* db not connected yet */ }
+    setSavingName(null);
+  }
+
+  async function removeFave(id: number) {
+    try {
+      await fetch(`/api/favorites/${id}`, { method: "DELETE" });
+      setFavorites((prev) => prev.filter((f) => f.id !== id));
+    } catch { /* ignore */ }
+  }
+
+  const chips = recentSearches.length > 0
+    ? recentSearches
+    : ["Spicy", "Vegetarian", "Indian", "Italian", "Mexican", "Japanese", "Thai", "Chinese"];
 
   return (
     <main className="relative min-h-screen bg-[#07070f] overflow-x-hidden">
@@ -249,12 +389,15 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Quick chips */}
+        {/* Quick chips — recent searches or defaults */}
         <div className="flex flex-wrap gap-2 mb-10 fade-up" style={{ animationDelay: "0.12s" }}>
-          {["🔥 Spicy","🥗 Vegetarian","🍛 Indian","🍕 Italian","🌮 Mexican","🍣 Japanese","🍜 Thai","🥟 Chinese"].map((s) => (
+          {recentSearches.length > 0 && (
+            <span className="text-slate-600 text-xs self-center mr-1">Recent:</span>
+          )}
+          {chips.slice(0, 8).map((s) => (
             <button
               key={s}
-              onClick={() => handleSearch(s.split(" ")[1])}
+              onClick={() => handleSearch(s)}
               className="chip text-slate-300 text-sm font-medium px-4 py-1.5 rounded-full"
             >
               {s}
@@ -262,16 +405,33 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Browse grid — shown when not searched */}
+        {/* Home: favorites + browse grid */}
         {!searched && (
-          <div key="browse" className="fade-up" style={{ animationDelay: "0.16s" }}>
-            <h2 className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-4">Browse Cuisines</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              {CATEGORIES.map((cat) => (
-                <CatCard key={cat.value} cat={cat} onSelect={(v) => handleSearch(v)} />
-              ))}
+          <>
+            {/* Saved favorites */}
+            {favorites.length > 0 && (
+              <div className="mb-8 fade-up" style={{ animationDelay: "0.14s" }}>
+                <h2 className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-4">
+                  ❤️ Saved Favorites ({favorites.length})
+                </h2>
+                <div className="space-y-3">
+                  {favorites.map((fav) => (
+                    <FaveCard key={fav.id} fav={fav} onRemove={() => removeFave(fav.id)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Browse grid */}
+            <div key="browse" className="fade-up" style={{ animationDelay: "0.16s" }}>
+              <h2 className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-4">Browse Cuisines</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                {CATEGORIES.map((cat) => (
+                  <CatCard key={cat.value} cat={cat} onSelect={(v) => handleSearch(v)} />
+                ))}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Loading state */}
@@ -316,7 +476,15 @@ export default function Home() {
             </div>
             <div className="space-y-5">
               {results.slice(0, 3).map((food, i) => (
-                <FoodCard key={food.name} food={food} rank={i} delay={`${i * 0.08}s`} />
+                <FoodCard
+                  key={food.name}
+                  food={food}
+                  rank={i}
+                  delay={`${i * 0.08}s`}
+                  isFaved={isFaved(food)}
+                  onToggleFave={() => toggleFave(food)}
+                  saving={savingName === food.name}
+                />
               ))}
             </div>
           </div>
