@@ -7,6 +7,8 @@ import { converse } from "@/lib/companion/brain";
 import { getHistory, appendTurn } from "@/lib/companion/memory";
 import { getProfile, getMemories } from "@/lib/companion/profiles";
 import { expressionFor } from "@/lib/companion/expressions";
+import { getControls } from "@/lib/companion/privacy";
+import { logEvent } from "@/lib/companion/audit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,6 +17,15 @@ export async function POST(req: NextRequest) {
     const contentType = req.headers.get("content-type") || "audio/webm";
     const audio = await req.arrayBuffer();
     if (!audio.byteLength) return NextResponse.json({ error: "empty audio" }, { status: 400 });
+
+    // COPPA/GDPR-K gate: no processing without parental consent + mic enabled.
+    const controls = await getControls(childId).catch(() => null);
+    if (controls && !controls.consented) {
+      return NextResponse.json({ error: "parental consent required" }, { status: 403 });
+    }
+    if (controls && !controls.micEnabled) {
+      return NextResponse.json({ error: "microphone disabled by parent" }, { status: 403 });
+    }
 
     const transcript = await transcribe(audio, contentType);
     if (!transcript) return NextResponse.json({ error: "no speech detected" }, { status: 422 });
@@ -34,6 +45,7 @@ export async function POST(req: NextRequest) {
     });
     await appendTurn(sessionId, "user", transcript).catch(() => {});
     await appendTurn(sessionId, "assistant", reply).catch(() => {});
+    await logEvent(childId, "voice_interaction", emotion).catch(() => {});
 
     const expr = expressionFor(emotion);
     const speech = await synthesize(reply);

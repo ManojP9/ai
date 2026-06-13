@@ -78,6 +78,9 @@ export default function Home() {
       <Pressable style={styles.buttonGhost} onPress={() => router.push("/provision")}>
         <Text style={styles.buttonGhostText}>Change Wi-Fi</Text>
       </Pressable>
+      <Pressable style={styles.buttonGhost} onPress={() => router.push("/privacy")}>
+        <Text style={styles.buttonGhostText}>Privacy & Safety</Text>
+      </Pressable>
       <Pressable onPress={signOut}><Text style={styles.link}>Sign out</Text></Pressable>
     </View>
   );

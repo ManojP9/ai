@@ -25,6 +25,7 @@ function RootNav() {
       <Stack.Screen name="provision" options={{ title: "Wi-Fi setup" }} />
       <Stack.Screen name="settings" options={{ title: "Settings" }} />
       <Stack.Screen name="personality" options={{ title: "Personality" }} />
+      <Stack.Screen name="privacy" options={{ title: "Privacy & Safety" }} />
     </Stack>
   );
 }

@@ -4,6 +4,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { COMPANION_MODEL } from "@/lib/companion/brain";
+import { getControls } from "@/lib/companion/privacy";
+import { logEvent } from "@/lib/companion/audit";
 
 type VisionResult = { childPresent: boolean; faces: number; scene: string; mood: string };
 
@@ -12,10 +14,20 @@ export async function POST(req: NextRequest) {
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 500 });
     }
+    const childId = req.nextUrl.searchParams.get("childId") || "anon";
     const contentType = req.headers.get("content-type") || "image/jpeg";
     const mediaType = contentType.startsWith("image/") ? contentType : "image/jpeg";
     const bytes = await req.arrayBuffer();
     if (!bytes.byteLength) return NextResponse.json({ error: "empty image" }, { status: 400 });
+
+    // COPPA/GDPR-K gate: no camera processing without consent + camera enabled.
+    const controls = await getControls(childId).catch(() => null);
+    if (controls && !controls.consented) {
+      return NextResponse.json({ error: "parental consent required" }, { status: 403 });
+    }
+    if (controls && !controls.cameraEnabled) {
+      return NextResponse.json({ error: "camera disabled by parent" }, { status: 403 });
+    }
     const data = Buffer.from(bytes).toString("base64");
 
     const client = new Anthropic();
@@ -60,6 +72,7 @@ export async function POST(req: NextRequest) {
       .map((b) => b.text)
       .join("");
     const result = JSON.parse(text) as VisionResult;
+    await logEvent(childId, "vision_capture", result.scene).catch(() => {});
     return NextResponse.json(result);
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "error" }, { status: 500 });

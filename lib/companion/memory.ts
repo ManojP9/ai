@@ -2,6 +2,7 @@
 // Stores turns in Postgres so a session keeps short-term context across requests.
 import { sql } from "@vercel/postgres";
 import type { Turn } from "./brain";
+import { encryptField, decryptField } from "./crypto";
 
 export async function initCompanionMemory() {
   await sql`
@@ -25,13 +26,13 @@ export async function getHistory(sessionId: string, limit = 12): Promise<Turn[]>
       ORDER BY id DESC LIMIT ${limit}
     ) recent ORDER BY id ASC
   `;
-  return rows.map((r) => ({ role: r.role, content: r.content }));
+  return rows.map((r) => ({ role: r.role, content: decryptField(r.content) }));
 }
 
 export async function appendTurn(sessionId: string, role: "user" | "assistant", content: string) {
   await initCompanionMemory();
   await sql`
     INSERT INTO companion_messages (session_id, role, content)
-    VALUES (${sessionId}, ${role}, ${content})
+    VALUES (${sessionId}, ${role}, ${encryptField(content)})
   `;
 }
