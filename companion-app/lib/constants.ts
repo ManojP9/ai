@@ -14,6 +14,12 @@ export const BLE = {
   DEVICE_NAME: "AI-Baby-Companion",
 } as const;
 
+// Backend base URL (the Next.js app). Set EXPO_PUBLIC_API_BASE for your deployment.
+export const API_BASE = process.env.EXPO_PUBLIC_API_BASE || "https://ai-kohl-nine-89.vercel.app";
+
+export const PERSONALITY_PRESETS = ["playful", "gentle", "curious", "sleepy_calm"] as const;
+export type PersonalityPreset = (typeof PERSONALITY_PRESETS)[number];
+
 export const STORAGE = {
   AUTH_TOKEN: "companion.authToken",
   PAIRED_DEVICE_ID: "companion.pairedDeviceId",

@@ -4,6 +4,7 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-nati
 import { useFocusEffect, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { connect, disconnect, readBattery, readStatus, DeviceStatus } from "@/lib/ble";
+import { registerForPush } from "@/lib/push";
 import { STORAGE } from "@/lib/constants";
 import { useAuth } from "@/lib/auth";
 
@@ -24,6 +25,7 @@ export default function Home() {
         if (!active) return;
         setPairedId(id);
         if (id) {
+          registerForPush(id).catch(() => {}); // best-effort push registration
           try {
             const device = await connect(id);
             if (!active) return;
@@ -67,8 +69,11 @@ export default function Home() {
         <Row label="Battery" value={battery != null ? `${battery}%` : "—"} />
         <Row label="Wi-Fi" value={status?.wifi || "Not connected"} />
       </View>
-      <Pressable style={styles.button} onPress={() => router.push("/settings")}>
-        <Text style={styles.buttonText}>Settings</Text>
+      <Pressable style={styles.button} onPress={() => router.push("/personality")}>
+        <Text style={styles.buttonText}>Personality</Text>
+      </Pressable>
+      <Pressable style={styles.buttonGhost} onPress={() => router.push("/settings")}>
+        <Text style={styles.buttonGhostText}>Settings</Text>
       </Pressable>
       <Pressable style={styles.buttonGhost} onPress={() => router.push("/provision")}>
         <Text style={styles.buttonGhostText}>Change Wi-Fi</Text>
