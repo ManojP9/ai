@@ -30,7 +30,7 @@ an app feature.
 
 ## Work Guidance
 
-- See root `rules.md` for coding behavior rules
+- See root `AGENTS.md` → Coding Guidelines for coding behavior rules
 
 ## Verification
 

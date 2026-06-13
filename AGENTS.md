@@ -77,10 +77,18 @@ The repo doubles as an Obsidian "LLM Wiki" vault — see `CLAUDE.md` for the vau
 
 ## Coding Guidelines
 
-Behavioral coding rules (Think Before Coding, Simplicity First, Surgical Changes,
-Goal-Driven Execution) live in the root `rules.md` and a `rules.md` in each directory. DOX
-owns **structure and contracts**; `rules.md` owns **coding behavior**. Do not duplicate one
-into the other.
+Behavioral rules for any code change (adapted from the Karpathy guidelines —
+https://github.com/multica-ai/andrej-karpathy-skills):
+
+1. **Think before coding** — state assumptions, surface ambiguity, suggest simpler
+   alternatives instead of deciding silently; stop and articulate confusion rather than guessing.
+2. **Simplicity first** — minimal code for the actual request; no features beyond spec, no
+   single-use abstractions, no unrequested flexibility, no handling of impossible errors.
+   Test: *"Would a senior engineer find this overcomplicated?"*
+3. **Surgical changes** — touch only what the task needs; match existing style; don't refactor
+   working code; flag (don't remove) unrelated dead code. Every changed line ties to the request.
+4. **Goal-driven execution** — turn vague requests into testable success criteria; state a
+   brief plan with verification checkpoints; reproduce a bug with a test before fixing it.
 
 ## Verification
 
