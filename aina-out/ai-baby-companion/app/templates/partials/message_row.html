@@ -1,0 +1,5 @@
+<tr>
+  <td>{% if m.role == 'child' %}<span class="badge badge--accent">child</span>{% else %}<span class="badge badge--success">companion</span>{% endif %}</td>
+  <td>{{ m.text }}{% if m.emotion %} <span class="faint">· {{ m.emotion }}</span>{% endif %}</td>
+  <td class="faint" style="font-size:12px; white-space:nowrap">{{ m.at[11:19] }}</td>
+</tr>

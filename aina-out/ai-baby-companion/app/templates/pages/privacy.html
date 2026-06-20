@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block heading %}Privacy center{% endblock %}
+{% block content %}
+  <div class="card" style="max-width:820px">
+    <div class="card__head">
+      <div class="card__title">Your data & rights</div>
+      <span class="badge badge--success">COPPA · GDPR-K</span>
+    </div>
+    <div class="card__body">
+      <p class="muted">This product captures a young child's voice and (optionally) camera, so privacy is load-bearing. Here is exactly how it is governed:</p>
+      <div class="grid grid--2 mt-3">
+        <div><strong>Consent first</strong><p class="faint" style="font-size:13px">No mic or camera processing happens without verifiable parental consent. Requests return 403 until consent exists.</p></div>
+        <div><strong>Per-sensor control</strong><p class="faint" style="font-size:13px">Microphone and camera switches per child, enforced server-side on every request.</p></div>
+        <div><strong>Encryption at rest</strong><p class="faint" style="font-size:13px">Conversation content is encrypted (AES-256-GCM in production); HTTPS/TLS in transit.</p></div>
+        <div><strong>Retention</strong><p class="faint" style="font-size:13px">Conversation turns auto-expire after {{ retention }} days via a daily job.</p></div>
+        <div><strong>Access (export)</strong><p class="faint" style="font-size:13px">Download everything stored for a child as JSON, any time.</p></div>
+        <div><strong>Erasure</strong><p class="faint" style="font-size:13px">Delete a child to purge messages, memory, profile, controls, and audit across all tables.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-3" style="max-width:820px">
+    <div class="card__head"><div class="card__title">Per-child controls</div></div>
+    <table class="table">
+      <thead><tr><th>Child</th><th>Consent</th><th>Mic</th><th>Camera</th><th></th></tr></thead>
+      <tbody>
+        {% for c in children %}
+          <tr>
+            <td><a href="/children/{{ c.id }}"><strong>{{ c.name }}</strong></a></td>
+            <td>{% if c.consent %}<span class="badge badge--success">yes</span>{% else %}<span class="badge badge--warning">no</span>{% endif %}</td>
+            <td>{% if c.mic %}<span class="badge badge--accent">on</span>{% else %}<span class="badge">off</span>{% endif %}</td>
+            <td>{% if c.camera %}<span class="badge badge--accent">on</span>{% else %}<span class="badge">off</span>{% endif %}</td>
+            <td style="text-align:right"><a class="btn btn--ghost btn--sm" href="/children/{{ c.id }}/export">Export</a></td>
+          </tr>
+        {% else %}<tr><td colspan="5"><div class="empty">No children yet.</div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

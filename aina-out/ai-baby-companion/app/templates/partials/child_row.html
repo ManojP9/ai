@@ -1,0 +1,18 @@
+<tr id="child-{{ c.id }}">
+  <td><a href="/children/{{ c.id }}"><strong>{{ c.name }}</strong></a> <span class="faint">· {{ c.age_band }}</span></td>
+  <td class="muted">{{ c.personality }}</td>
+  <td>
+    {% if c.consent %}<span class="badge badge--success">consented</span>{% else %}<span class="badge badge--warning">no consent</span>{% endif %}
+  </td>
+  <td>
+    {% if c.device.online %}<span class="badge badge--accent">online · {{ c.device.battery }}%</span>{% else %}<span class="badge">offline</span>{% endif %}
+  </td>
+  <td style="text-align:right">
+    <a class="btn btn--ghost btn--sm" href="/children/{{ c.id }}">Manage</a>
+    <button class="btn btn--ghost btn--sm"
+            hx-delete="/children/{{ c.id }}"
+            hx-target="#child-{{ c.id }}"
+            hx-swap="outerHTML"
+            hx-confirm="Erase ALL data for {{ c.name }}? This cannot be undone.">Erase</button>
+  </td>
+</tr>

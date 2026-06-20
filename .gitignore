@@ -7,3 +7,6 @@ node_modules/
 *.tsbuildinfo
 companion-app/node_modules/
 companion-app/.expo/
+
+# AiNa App Factory — packaged zip is a regenerable artifact of aina-out/<slug>/
+aina-out/*.zip

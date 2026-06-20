@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Baby Companion — screen-free play you can trust</title>
+<meta name="description" content="A voice-first AI companion toy for young children, with a parent dashboard that puts consent, history, and the delete button in your hands.">
+<style>
+  :root{
+    --cream:#fbf7f0; --ink:#1f2a37; --muted:#5b6775; --teal:#1f9e96; --teal-d:#15807a;
+    --coral:#ef6f5b; --line:#ece4d8; --card:#ffffff;
+  }
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--cream);line-height:1.55}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 22px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+  .logo{width:34px;height:34px;border-radius:11px;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:800}
+  .btn{display:inline-block;background:var(--coral);color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:12px;border:none;cursor:pointer}
+  .btn--ghost{background:transparent;color:var(--teal-d);border:1.5px solid var(--teal)}
+  .hero{padding:46px 0 30px;display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center}
+  .hero h1{font-size:44px;line-height:1.1;margin:.1em 0 .4em;letter-spacing:-.5px}
+  .hero p.sub{font-size:18px;color:var(--muted);margin:0 0 26px}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(31,42,55,.06)}
+  .panel h3{margin:0 0 12px;font-size:15px;color:var(--muted);font-weight:600}
+  .ctrl{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)}
+  .ctrl:last-child{border-bottom:none}
+  .switch{width:42px;height:24px;border-radius:99px;background:var(--teal);position:relative}
+  .switch.off{background:#cdd5dd}
+  .switch::after{content:"";position:absolute;top:3px;left:21px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+  .switch.off::after{left:3px}
+  .badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:6px 0 38px}
+  .badge{background:#fff;border:1px solid var(--line);border-radius:99px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--teal-d)}
+  section.features{padding:18px 0 8px}
+  h2.section{font-size:28px;text-align:center;margin:14px 0 6px;letter-spacing:-.3px}
+  p.lede{text-align:center;color:var(--muted);max-width:620px;margin:0 auto 26px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .feature{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .feature .ic{width:38px;height:38px;border-radius:11px;background:#eafaf8;color:var(--teal-d);display:grid;place-items:center;font-size:20px;margin-bottom:10px}
+  .feature h4{margin:0 0 6px;font-size:17px}
+  .feature p{margin:0;color:var(--muted);font-size:14.5px}
+  .trust{margin:40px 0;background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px;text-align:center}
+  .trust h2{margin:0 0 8px;font-size:24px}
+  .trust p{color:var(--muted);margin:0 auto 18px;max-width:560px}
+  footer{padding:30px 0 50px;color:var(--muted);font-size:13px;text-align:center}
+  @media(max-width:780px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.hero h1{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="logo">A</span> AI Baby Companion</div>
+    <a class="btn btn--ghost" href="#cta">Join the waitlist</a>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>Screen-free play your kid will love — and you can trust.</h1>
+      <p class="sub">A plush companion that talks, listens, and remembers — with a parent dashboard that puts consent, history, and the delete button in your hands.</p>
+      <div class="cta-row">
+        <a class="btn" href="#cta">Join the waitlist</a>
+        <a class="btn btn--ghost" href="#how">See how control works</a>
+      </div>
+    </div>
+    <div class="panel" aria-label="Parent controls preview">
+      <h3>Mia's controls · you decide</h3>
+      <div class="ctrl"><span>Consent</span><span class="switch" title="on"></span></div>
+      <div class="ctrl"><span>Microphone</span><span class="switch" title="on"></span></div>
+      <div class="ctrl"><span>Camera</span><span class="switch off" title="off"></span></div>
+      <div class="ctrl"><span>Auto-delete history</span><span style="font-weight:600;color:var(--teal-d)">30 days</span></div>
+      <div style="margin-top:14px"><a class="btn" style="width:100%;text-align:center" href="#cta">Export or erase, anytime</a></div>
+    </div>
+  </section>
+
+  <div class="badges">
+    <span class="badge">✓ COPPA</span>
+    <span class="badge">✓ GDPR-K</span>
+    <span class="badge">✓ Encrypted at rest</span>
+    <span class="badge">✓ Screen-free</span>
+  </div>
+
+  <section class="features" id="how">
+    <h2 class="section">You're in control — really in control</h2>
+    <p class="lede">Other talking toys ask you to trust them. We hand you the switches, the transcript, and the delete button.</p>
+    <div class="grid">
+      <div class="feature"><div class="ic">🔒</div><h4>Consent-first</h4><p>No microphone or camera works until you allow it — enforced on our servers, not just hidden in an app menu.</p></div>
+      <div class="feature"><div class="ic">📖</div><h4>Read every word</h4><p>Every conversation is encrypted and yours to review. Nothing happens in the dark.</p></div>
+      <div class="feature"><div class="ic">🗑️</div><h4>Delete in one tap</h4><p>Export or fully erase your child's data whenever you want — no support ticket, no waiting.</p></div>
+      <div class="feature"><div class="ic">✨</div><h4>A friend that remembers</h4><p>Pick a personality — Curious Explorer, Gentle Storyteller — and the toy remembers your child between chats.</p></div>
+    </div>
+  </section>
+
+  <section class="trust" id="cta">
+    <h2>Less screen time, without less control.</h2>
+    <p>Be first to bring home the companion built to a children's-privacy bar from the very first chip.</p>
+    <a class="btn" href="#">Join the waitlist</a>
+  </section>
+
+  <footer>
+    AI Baby Companion · screen-free, consent-first AI for ages 3–7.<br>
+    This page is a generated marketing artifact. Claims map to the product's documented privacy posture (see PRIVACY.md).
+  </footer>
+</div>
+</body>
+</html>
