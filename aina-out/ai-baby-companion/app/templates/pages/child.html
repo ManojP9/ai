@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block heading %}{{ c.name }}{% endblock %}
+{% block actions %}
+  <a class="btn" href="/children/{{ c.id }}/export">Export data</a>
+{% endblock %}
+{% block content %}
+  <div class="grid grid--2" style="grid-template-columns: 1fr 340px; align-items:start;">
+
+    <!-- Left: conversation -->
+    <div class="card">
+      <div class="card__head">
+        <div class="card__title">Conversation history</div>
+        <button class="btn btn--ghost btn--sm" hx-post="/children/{{ c.id }}/clear"
+                hx-target="#msg-list" hx-swap="innerHTML"
+                hx-confirm="Clear all stored turns for {{ c.name }}?">Clear history</button>
+      </div>
+      <p class="faint" style="font-size:12px; padding:0 4px 8px">Stored encrypted at rest · auto-expires after the retention window.</p>
+      <table class="table">
+        <thead><tr><th>Who</th><th>Said</th><th>Time</th></tr></thead>
+        <tbody id="msg-list">
+          {% for m in messages %}
+            {% include "partials/message_row.html" %}
+          {% else %}
+            <tr id="msg-empty"><td colspan="3"><div class="empty"><div class="empty__icon">💬</div>No conversation yet</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="card__body">
+        <form hx-post="/children/{{ c.id }}/say" hx-target="#msg-list" hx-swap="beforeend" hx-on::after-request="this.reset()">
+          <div class="field">
+            <label for="text">Simulate a child turn (gated on consent + mic)</label>
+            <input class="input" id="text" name="text" placeholder="e.g. Tell me a story" required>
+          </div>
+          <button class="btn btn--primary" type="submit">Send turn</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right: governance -->
+    <div class="grid" style="gap:16px">
+      <div class="card">
+        <div class="card__head"><div class="card__title">Consent</div></div>
+        <div class="card__body">
+          <p class="muted" style="font-size:13px">
+            {% if c.consent %}Granted via <strong>{{ c.consent_method }}</strong>.{% else %}No consent on record. The toy cannot capture mic or camera.{% endif %}
+          </p>
+          {% if c.consent %}
+            <form hx-post="/children/{{ c.id }}/consent"><input type="hidden" name="grant" value="0">
+              <button class="btn btn--ghost mt-2" type="submit" style="width:100%">Withdraw consent</button></form>
+          {% else %}
+            <form hx-post="/children/{{ c.id }}/consent"><input type="hidden" name="grant" value="1"><input type="hidden" name="method" value="payment-card">
+              <button class="btn btn--primary mt-2" type="submit" style="width:100%">Grant consent</button></form>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__head"><div class="card__title">Sensors</div></div>
+        <div class="card__body">
+          <form hx-post="/children/{{ c.id }}/controls">
+            <label class="row between" style="padding:6px 0"><span>Microphone</span>
+              <input type="checkbox" name="mic" value="1" {% if c.mic %}checked{% endif %} {% if not c.consent %}disabled{% endif %}></label>
+            <label class="row between" style="padding:6px 0"><span>Camera</span>
+              <input type="checkbox" name="camera" value="1" {% if c.camera %}checked{% endif %} {% if not c.consent %}disabled{% endif %}></label>
+            <button class="btn btn--primary mt-2" type="submit" style="width:100%" {% if not c.consent %}disabled{% endif %}>Save sensors</button>
+            {% if not c.consent %}<p class="faint mt-2" style="font-size:12px">Grant consent to enable sensors.</p>{% endif %}
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__head"><div class="card__title">Personality</div></div>
+        <div class="card__body">
+          <form hx-post="/children/{{ c.id }}/personality">
+            <div class="field">
+              <select class="input" name="personality">
+                {% for p in personalities %}<option value="{{ p }}" {% if p == c.personality %}selected{% endif %}>{{ p }}</option>{% endfor %}
+              </select>
+            </div>
+            <label class="row between"><span>Playfulness</span><input type="range" name="playfulness" min="0" max="10" value="{{ c.traits.playfulness }}"></label>
+            <label class="row between"><span>Talkativeness</span><input type="range" name="talkativeness" min="0" max="10" value="{{ c.traits.talkativeness }}"></label>
+            <label class="row between"><span>Energy</span><input type="range" name="energy" min="0" max="10" value="{{ c.traits.energy }}"></label>
+            <button class="btn btn--primary mt-2" type="submit" style="width:100%">Save personality</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__head"><div class="card__title">Audit log</div></div>
+        <div class="card__body" style="max-height:220px; overflow:auto">
+          {% for a in c.audit %}
+            <div class="row between" style="padding:6px 0; border-bottom:1px solid var(--border)">
+              <span style="font-size:13px"><strong>{{ a.action }}</strong> <span class="faint">{{ a.detail }}</span></span>
+              <span class="faint" style="font-size:11px; white-space:nowrap">{{ a.at[11:19] }}</span>
+            </div>
+          {% else %}<p class="faint">No activity yet.</p>{% endfor %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__head"><div class="card__title">Danger zone</div></div>
+        <div class="card__body">
+          <p class="faint" style="font-size:12px">Erasure permanently purges this child across every table.</p>
+          <button class="btn btn--ghost mt-2" style="width:100%"
+                  hx-delete="/children/{{ c.id }}" hx-confirm="Erase ALL data for {{ c.name }}?"
+                  hx-on::after-request="window.location.href='/'">Erase {{ c.name }}'s data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,42 @@
+---
+phase: 16
+status: pending
+lessonCount: 25
+tags: [course/aiefs, phase/16]
+---
+
+# Phase 16 — Multi Agent And Swarms
+
+> Part of [[index|AI Engineering From Scratch]]. Check a box when a lesson is done.
+
+## Lessons (25)
+
+- [ ] **01** — Why Multi Agent · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/01-why-multi-agent/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent/code)
+- [ ] **02** — Fipa Acl Heritage · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/02-fipa-acl-heritage/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/02-fipa-acl-heritage/code)
+- [ ] **03** — Communication Protocols · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/03-communication-protocols/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/03-communication-protocols/code)
+- [ ] **04** — Primitive Model · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/04-primitive-model/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/04-primitive-model/code)
+- [ ] **05** — Supervisor Orchestrator Pattern · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/code)
+- [ ] **06** — Hierarchical Architecture · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/06-hierarchical-architecture/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/06-hierarchical-architecture/code)
+- [ ] **07** — Society Of Mind Debate · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/07-society-of-mind-debate/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/07-society-of-mind-debate/code)
+- [ ] **08** — Role Specialization · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/08-role-specialization/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/08-role-specialization/code)
+- [ ] **09** — Parallel Swarm Networks · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/09-parallel-swarm-networks/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/09-parallel-swarm-networks/code)
+- [ ] **10** — Group Chat Speaker Selection · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/10-group-chat-speaker-selection/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/10-group-chat-speaker-selection/code)
+- [ ] **11** — Handoffs And Routines · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/11-handoffs-and-routines/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/11-handoffs-and-routines/code)
+- [ ] **12** — A2a Protocol · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/12-a2a-protocol/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/12-a2a-protocol/code)
+- [ ] **13** — Shared Memory Blackboard · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/code)
+- [ ] **14** — Consensus And Bft · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/14-consensus-and-bft/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/14-consensus-and-bft/code)
+- [ ] **15** — Voting Debate Topology · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/15-voting-debate-topology/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/15-voting-debate-topology/code)
+- [ ] **16** — Negotiation Bargaining · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/16-negotiation-bargaining/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/16-negotiation-bargaining/code)
+- [ ] **17** — Generative Agents Simulation · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/17-generative-agents-simulation/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/17-generative-agents-simulation/code)
+- [ ] **18** — Theory Of Mind Coordination · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/18-theory-of-mind-coordination/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/18-theory-of-mind-coordination/code)
+- [ ] **19** — Swarm Optimization Pso Aco · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/19-swarm-optimization-pso-aco/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/19-swarm-optimization-pso-aco/code)
+- [ ] **20** — Marl Maddpg Qmix Mappo · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/20-marl-maddpg-qmix-mappo/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/20-marl-maddpg-qmix-mappo/code)
+- [ ] **21** — Agent Economies · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/21-agent-economies/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/21-agent-economies/code)
+- [ ] **22** — Production Scaling Queues Checkpoints · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/code)
+- [ ] **23** — Failure Modes Mast Groupthink · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/23-failure-modes-mast-groupthink/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/23-failure-modes-mast-groupthink/code)
+- [ ] **24** — Evaluation Coordination Benchmarks · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/24-evaluation-coordination-benchmarks/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/24-evaluation-coordination-benchmarks/code)
+- [ ] **25** — Case Studies 2026 Sota · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/16-multi-agent-and-swarms/25-case-studies-2026-sota/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/25-case-studies-2026-sota/code)
+
+## Notes
+
+_Capture key takeaways, gotchas, and links to your own code here as you go._

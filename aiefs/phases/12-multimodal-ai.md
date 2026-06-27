@@ -1,0 +1,42 @@
+---
+phase: 12
+status: pending
+lessonCount: 25
+tags: [course/aiefs, phase/12]
+---
+
+# Phase 12 — Multimodal AI
+
+> Part of [[index|AI Engineering From Scratch]]. Check a box when a lesson is done.
+
+## Lessons (25)
+
+- [ ] **01** — Vision Transformer Patch Tokens · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/01-vision-transformer-patch-tokens/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/01-vision-transformer-patch-tokens/code)
+- [ ] **02** — CLIP Contrastive Pretraining · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/02-clip-contrastive-pretraining/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/02-clip-contrastive-pretraining/code)
+- [ ] **03** — Blip2 Qformer Bridge · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/03-blip2-qformer-bridge/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/03-blip2-qformer-bridge/code)
+- [ ] **04** — Flamingo Gated Cross Attention · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/04-flamingo-gated-cross-attention/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/04-flamingo-gated-cross-attention/code)
+- [ ] **05** — Llava Visual Instruction Tuning · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/05-llava-visual-instruction-tuning/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/05-llava-visual-instruction-tuning/code)
+- [ ] **06** — Any Resolution Patch N Pack · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/06-any-resolution-patch-n-pack/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/06-any-resolution-patch-n-pack/code)
+- [ ] **07** — Open Weight Vlm Recipes · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/07-open-weight-vlm-recipes/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/07-open-weight-vlm-recipes/code)
+- [ ] **08** — Llava Onevision Single Multi Video · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/08-llava-onevision-single-multi-video/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/08-llava-onevision-single-multi-video/code)
+- [ ] **09** — Qwen Vl Family Dynamic Fps · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps/code)
+- [ ] **10** — Internvl3 Native Multimodal · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/10-internvl3-native-multimodal/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/10-internvl3-native-multimodal/code)
+- [ ] **11** — Chameleon Early Fusion Tokens · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/11-chameleon-early-fusion-tokens/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/11-chameleon-early-fusion-tokens/code)
+- [ ] **12** — Emu3 Next Token For Generation · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/12-emu3-next-token-for-generation/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/12-emu3-next-token-for-generation/code)
+- [ ] **13** — Transfusion Autoregressive Diffusion · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/13-transfusion-autoregressive-diffusion/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/13-transfusion-autoregressive-diffusion/code)
+- [ ] **14** — Show O Discrete Diffusion Unified · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified/code)
+- [ ] **15** — Janus Pro Decoupled Encoders · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/15-janus-pro-decoupled-encoders/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/15-janus-pro-decoupled-encoders/code)
+- [ ] **16** — Mio Any To Any Streaming · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/16-mio-any-to-any-streaming/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/16-mio-any-to-any-streaming/code)
+- [ ] **17** — Video Language Temporal Grounding · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/17-video-language-temporal-grounding/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/17-video-language-temporal-grounding/code)
+- [ ] **18** — Long Video Million Token · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/18-long-video-million-token/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/18-long-video-million-token/code)
+- [ ] **19** — Audio Language Whisper To Af3 · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/19-audio-language-whisper-to-af3/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/19-audio-language-whisper-to-af3/code)
+- [ ] **20** — Omni Models Thinker Talker · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/20-omni-models-thinker-talker/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/20-omni-models-thinker-talker/code)
+- [ ] **21** — Embodied Vlas Openvla Pi0 Groot · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/21-embodied-vlas-openvla-pi0-groot/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/21-embodied-vlas-openvla-pi0-groot/code)
+- [ ] **22** — Document Diagram Understanding · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/22-document-diagram-understanding/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/22-document-diagram-understanding/code)
+- [ ] **23** — Colpali Vision Native RAG · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/23-colpali-vision-native-rag/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/23-colpali-vision-native-rag/code)
+- [ ] **24** — Multimodal RAG Cross Modal · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/24-multimodal-rag-cross-modal/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/24-multimodal-rag-cross-modal/code)
+- [ ] **25** — Multimodal Agents Computer Use · [docs](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/phases/12-multimodal-ai/25-multimodal-agents-computer-use/docs/en.md) · [code](https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/25-multimodal-agents-computer-use/code)
+
+## Notes
+
+_Capture key takeaways, gotchas, and links to your own code here as you go._

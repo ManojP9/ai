@@ -612,6 +612,9 @@ export default function Home() {
             <Link href="/progress" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
               <span>📊</span><span className="hidden sm:inline">Progress</span>
             </Link>
+            <Link href="/learn" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+              <span>🧭</span><span className="hidden sm:inline">Learn</span>
+            </Link>
             <Link href="/profile" className="flex items-center gap-1 text-xs text-slate-600 hover:text-slate-400 transition-colors">
               <span>⚙️</span><span className="hidden sm:inline">Profile</span>
             </Link>

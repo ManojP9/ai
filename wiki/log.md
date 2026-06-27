@@ -18,3 +18,4 @@ Append-only. Format: `## [YYYY-MM-DD] phase:N | task | action`
 ## [2026-06-06] phase:1 | share-button | Web Share API + clipboard fallback + toast, PostHog share event
 ## [2026-06-06] phase:1 | error-handling | error.tsx boundary + loading.tsx skeleton, Toaster for UX errors
 ## [2026-06-06] phase:1 | COMPLETE | all 5 tasks shipped, deployed to https://ai-kohl-nine-89.vercel.app
+## [2026-06-27] phase:all | learn-tracker | added AI Engineering From Scratch course tracker — lib/curriculum.json (20 phases/503 lessons), course_lessons DB + /api/course, /learn coach dashboard, aiefs/ vault notes + Dataview
