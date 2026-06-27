@@ -475,6 +475,9 @@ export default function ProgressPage() {
           <Link href="/" className="chip text-slate-400 text-sm px-4 py-1.5 rounded-full font-medium hover:text-slate-200 transition-colors">
             ← 3C Foods
           </Link>
+          <Link href="/learn" className="chip text-slate-400 text-sm px-4 py-1.5 rounded-full font-medium hover:text-slate-200 transition-colors">
+            🧭 Learn
+          </Link>
         </div>
 
         {/* Header */}

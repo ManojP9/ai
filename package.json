@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "sync:curriculum": "node scripts/sync-curriculum.mjs",
+    "gen:vault": "node scripts/gen-vault.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.101.0",
